@@ -11,15 +11,14 @@ LLVM_SRC       := $(LLVM_DIR)/llvm
 BUILD_DIR      := build
 INSTALL_DIR    := $(BUILD_DIR)/install
 BIN_DIR        := $(INSTALL_DIR)/bin
-HEX_WRAPPER    := $(BIN_DIR)/hex
 
 GENERATOR      := Ninja
-BUILD_TYPE     := Release
+BUILD_TYPE     := RelWithDebInfo
 
 LLVM_PROJECTS  := clang;lld
-LLVM_TARGETS   := Hexagon
+LLVM_TARGETS   := Hexagon;RISCV
 
-CMAKE          := cmake
+CMAKE_BIN      := cmake
 NINJA_BIN      := ninja
 LLD_BIN        := lld
 CLANG_BIN      := clang
@@ -28,16 +27,34 @@ UNAME_S := $(shell uname -s)
 
 # ---------- Optional Parameters ----------
 SHALLOW ?= 1
-LLVM_ENABLE_LLD ?= OFF    # default OFF, can be overridden externally
+LLVM_ENABLE_LLD ?= OFF   
 
 # -------- Install paths for tools ----------
 NINJA_PATH := $(shell if command -v $(NINJA_BIN) >/dev/null 2>&1; then dirname $$(command -v $(NINJA_BIN)); else echo ""; fi)
 LLD_PATH   := $(shell if command -v $(LLD_BIN) >/dev/null 2>&1; then dirname $$(command -v $(LLD_BIN)); else echo ""; fi)
 CLANG_PATH := $(shell if command -v $(CLANG_BIN) >/dev/null 2>&1; then dirname $$(command -v $(CLANG_BIN)); else echo ""; fi)
+CMAKE_PATH := $(shell if command -v $(CMAKE_BIN) >/dev/null 2>&1; then dirname $$(command -v $(CMAKE_BIN)); else echo ""; fi)
 
 # ==============================================
 # Default target
-all: clang lld ninja llvm configure build install wrapper persist_path
+all: cmake clang lld ninja llvm configure build install 
+
+# -------- Ensure CMake is installed --------
+cmake:
+	@echo "Checking for CMake..."
+	@if [ -n "$(CMAKE_PATH)" ] && [ -x "$(CMAKE_PATH)/$(CMAKE_BIN)" ]; then \
+		echo "CMake already installed at $(CMAKE_PATH)"; \
+	else \
+		echo "Installing CMake..."; \
+		if [ "$(UNAME_S)" = "Linux" ]; then \
+			sudo apt update && sudo apt install -y cmake; \
+		elif [ "$(UNAME_S)" = "Darwin" ]; then \
+			brew install cmake; \
+		else \
+			echo "Please install CMake manually."; exit 1; \
+		fi; \
+		CMAKE_PATH=$$(dirname $$(command -v $(CMAKE_BIN))); \
+	fi
 
 # -------- Ensure Clang is installed --------
 clang:
@@ -110,10 +127,10 @@ llvm:
 # -------- Configure --------
 configure:
 	@echo "Configuring LLVM build (LLVM_ENABLE_LLD=$(LLVM_ENABLE_LLD))..."
-	@PATH=$(CLANG_PATH):$(LLD_PATH):$(NINJA_PATH):$$PATH \
+	@PATH=$(CMAKE_PATH):$(CLANG_PATH):$(LLD_PATH):$(NINJA_PATH):$$PATH \
 	CC=$(CLANG_PATH)/clang \
 	CXX=$(CLANG_PATH)/clang++ \
-	$(CMAKE) -S $(LLVM_SRC) -B $(BUILD_DIR) -G Ninja \
+	$(CMAKE_BIN) -S $(LLVM_SRC) -B $(BUILD_DIR) -G Ninja \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
 		-DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR) \
 		-DLLVM_ENABLE_PROJECTS="$(LLVM_PROJECTS)" \
@@ -125,37 +142,13 @@ configure:
 
 # -------- Build --------
 build:
-	$(NINJA_BIN) -C $(BUILD_DIR) -j$$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+	$(NINJA_BIN) -C $(BUILD_DIR) -j$$(nproc --ignore=1 2>/dev/null || sysctl -n hw.ncpu)
+#	$(NINJA_BIN) -C $(BUILD_DIR) -j12
 
 # -------- Install --------
 install:
-	$(NINJA_BIN) -C $(BUILD_DIR) install
-
-# -------- Create hex wrapper --------
-wrapper:
-	@mkdir -p $(BIN_DIR)
-	@echo '#!/bin/sh' > $(HEX_WRAPPER)
-	@echo 'DIR=$$(cd "$$(dirname "$$0")" && pwd)' >> $(HEX_WRAPPER)
-	@echo '"$$DIR/clang" --target=hexagon -mcpu=hexagonv68 "$$@"' >> $(HEX_WRAPPER)
-	@chmod +x $(HEX_WRAPPER)
-
-# -------- Persist PATH to ~/.bashrc --------
-persist_path:
-	@BASHRC="$(HOME)/.bashrc"; \
-	LINE='export PATH=$(BIN_DIR):$$PATH'; \
-	if grep -Fxq "$$LINE" "$$BASHRC" 2>/dev/null; then \
-		echo "Hexagon toolchain already in $$BASHRC"; \
-	else \
-		echo "" >> "$$BASHRC"; \
-		echo "# >>> Hexagon LLVM toolchain >>>" >> "$$BASHRC"; \
-		echo "$$LINE" >> "$$BASHRC"; \
-		echo "# <<< Hexagon LLVM toolchain <<<" >> "$$BASHRC"; \
-		echo "Added Hexagon toolchain to $$BASHRC"; \
-	fi
-
-# -------- Produce assembly example --------
-hexasm:
-	$(HEX_WRAPPER) -S test.c
+	$(NINJA_BIN) -C $(BUILD_DIR) -j$$(nproc --ignore=1 2>/dev/null || sysctl -n hw.ncpu) install 
+#	$(NINJA_BIN) -C $(BUILD_DIR) -j12 install
 
 # -------- Clean --------
 clean:
@@ -171,4 +164,4 @@ distclean: clean
 	fi
 
 # ==============================================
-.PHONY: all clang lld ninja llvm configure build install wrapper persist_path hexasm clean distclean
+.PHONY: all clang lld ninja llvm configure build install clean distclean

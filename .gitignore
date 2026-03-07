@@ -2,3 +2,4 @@ rtl/
 temp/
 sdk/*
 !sdk/Makefile
+qcom/
