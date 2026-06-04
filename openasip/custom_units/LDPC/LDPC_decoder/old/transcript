@@ -1,0 +1,207 @@
+# //  Questa Altera Starter FPGA Edition-64
+# //  Version 2025.2 linux_x86_64 May 31 2025
+# //
+# // Unpublished work. Copyright 2025 Siemens
+# //
+# // This material contains trade secrets or otherwise confidential information
+# // owned by Siemens Industry Software Inc. or its affiliates (collectively,
+# // "SISW"), or its licensors. Access to and use of this information is strictly
+# // limited as set forth in the Customer's applicable agreements with SISW.
+# //
+# // This material may not be copied, distributed, or otherwise disclosed outside
+# // of the Customer's facilities without the express written permission of SISW,
+# // and may not be used in any way not expressly authorized by SISW.
+# //
+# Loading project project_1
+# reading /home/victor/altera/25.1std/questa_fse/linux_x86_64/../modelsim.ini
+file mkdir /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim
+# Loading project cn_proc_vsim
+# Optimization canceled
+# Load canceled
+# Compile of cn_proc.v was successful.
+# Compile of tb.v failed with 5 errors.
+# 2 compiles, 1 failed with 5 errors.
+# Compile of tb.v failed with 5 errors.
+# Load canceled
+# Compile of tb.v failed with 5 errors.
+# Compile of tb.v failed with 14 errors.
+# Compile of tb.v failed with 14 errors.
+# Compile of cn_proc.v was successful.
+# Compile of tb.v failed with 14 errors.
+# 2 compiles, 1 failed with 14 errors.
+vlog tb.v
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:19:03 on Apr 21,2026
+# vlog -reportprogress 300 tb.v 
+# ** Note: (vlog-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# ** Error: (vlog-7) Failed to open design unit file "tb.v" in read mode.
+# No such file or directory. (errno = ENOENT)
+# End time: 23:19:03 on Apr 21,2026, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# /home/victor/altera/25.1std/questa_fse/linux_x86_64/vlog failed.
+cd ~
+$pwd
+# can't read "pwd": no such variable
+$cwd
+# can't read "cwd": no such variable
+cwd
+# invalid command name "cwd"
+ls
+# cn_proc_vsim.mpf
+# work
+cd ..
+# Compile of tb.v failed with 14 errors.
+
+vlog cn_proc.v
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:20:56 on Apr 21,2026
+# vlog -reportprogress 300 cn_proc.v 
+# ** Note: (vlog-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# ** Error: (vlog-7) Failed to open design unit file "cn_proc.v" in read mode.
+# No such file or directory. (errno = ENOENT)
+# End time: 23:20:56 on Apr 21,2026, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# /home/victor/altera/25.1std/questa_fse/linux_x86_64/vlog failed.
+cd ~
+# reading /home/victor/altera/25.1std/questa_fse/linux_x86_64/../modelsim.ini
+ls
+# alias
+# altera
+# books
+# Desktop
+# Documents
+# dotfiles
+# Downloads
+# Figure_1.png
+# github
+# librelane
+# licenses
+# local
+# Music
+# my_designs
+# openairinterface5g
+# openasip-devel
+# openasip_personal_designs
+# open_baseband
+# OpenROAD-flow-scripts
+# Pictures
+# Public
+# questa_projects
+# scripts
+# snap
+# synopsis_training
+# tce_tutorials
+# Templates
+# usp
+# Videos
+# vivado_projects
+cd open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim
+ls
+# cn_proc_vsim.cr.mti
+# cn_proc_vsim.mpf
+# work
+project addfile ../rtl/tb.v
+# A project is not currently open.
+# Loading project cn_proc_vsim
+
+
+
+vlog tb.v
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:23:22 on Apr 21,2026
+# vlog -reportprogress 300 tb.v 
+# ** Note: (vlog-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# ** Error: (vlog-7) Failed to open design unit file "tb.v" in read mode.
+# No such file or directory. (errno = ENOENT)
+# End time: 23:23:22 on Apr 21,2026, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# /home/victor/altera/25.1std/questa_fse/linux_x86_64/vlog failed.
+ls
+# cn_proc_vsim.cr.mti
+# cn_proc_vsim.mpf
+# work
+ls
+# cn_proc_vsim.cr.mti
+# cn_proc_vsim.mpf
+# work
+ls
+# cn_proc_vsim.cr.mti
+# cn_proc_vsim.mpf
+# work
+ls
+# cn_proc_vsim.cr.mti
+# cn_proc_vsim.mpf
+# work
+vlog ../rtl/tb.v
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:23:38 on Apr 21,2026
+# vlog -reportprogress 300 ../rtl/tb.v 
+# ** Note: (vlog-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# -- Compiling module tb_cn_proc
+# ** Error: ../rtl/tb.v(80): Declarations not allowed in unnamed block.
+# ** Error: ../rtl/tb.v(81): Declarations not allowed in unnamed block.
+# ** Error: (vlog-13057) ../rtl/tb.v(126): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(127): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(127): Expecting numeric digits.
+# -- Compiling module tb_cn_proc
+# ** Warning: ../rtl/tb.v(165): (vlog-2275) Existing module 'tb_cn_proc' at line 3 will be overwritten.
+# ** Error: (vlog-13057) ../rtl/tb.v(266): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(266): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(267): Expecting numeric digits.
+# -- Compiling module tb_cn_proc
+# ** Warning: ../rtl/tb.v(278): (vlog-2275) Existing module 'tb_cn_proc' at line 165 will be overwritten.
+# ** Error: (vlog-13057) ../rtl/tb.v(379): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(379): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(380): Expecting numeric digits.
+# -- Compiling module tb_cn_proc
+# ** Warning: ../rtl/tb.v(391): (vlog-2275) Existing module 'tb_cn_proc' at line 278 will be overwritten.
+# ** Error: (vlog-13057) ../rtl/tb.v(492): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(492): Expecting numeric digits.
+# ** Error: (vlog-13057) ../rtl/tb.v(493): Expecting numeric digits.
+# End time: 23:23:38 on Apr 21,2026, Elapsed time: 0:00:00
+# Errors: 14, Warnings: 3
+# /home/victor/altera/25.1std/questa_fse/linux_x86_64/vlog failed.
+
+vlog ../rtl/cn_proc.v ../rtl/tb.v
+# Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+# Start time: 23:25:27 on Apr 21,2026
+# vlog -reportprogress 300 ../rtl/cn_proc.v ../rtl/tb.v 
+# ** Note: (vlog-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# -- Compiling module cn_proc
+# -- Compiling module tb_cn_proc
+# 
+# Top level modules:
+# 	tb_cn_proc
+# End time: 23:25:27 on Apr 21,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vsim cn_proc_vsim
+# ** Note: (vsim-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# vsim cn_proc_vsim 
+# Start time: 23:25:46 on Apr 21,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Note: (vopt-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# ** Error: (vopt-11) Could not find work.cn_proc_vsim.
+# Optimization failed
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=1, Warnings=0.
+# Error loading design
+# End time: 23:25:47 on Apr 21,2026, Elapsed time: 0:00:01
+# Errors: 1, Warnings: 15
+# Compile of cn_proc.v was successful.
+# Compile of tb.v was successful.
+# 2 compiles, 0 failed with no errors.
+# Load canceled
+vsim tb_cn_proc
+# ** Note: (vsim-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# vsim tb_cn_proc 
+# Start time: 23:26:33 on Apr 21,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Note: (vopt-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/vsim/cn_proc_vsim.mpf' is used as the ini file.
+# Loading work.tb_cn_proc(fast)
+add wave -position insertpoint  \
+sim:/#vsim_capacity#/totals \
+sim:/#vsim_capacity#/classes \
+sim:/#vsim_capacity#/qdas \
+sim:/#vsim_capacity#/assertions \
+sim:/#vsim_capacity#/covergroups \
+sim:/#vsim_capacity#/solver \
+sim:/#vsim_capacity#/memories
