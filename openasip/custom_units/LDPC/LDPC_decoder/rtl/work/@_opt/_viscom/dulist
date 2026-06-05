@@ -1,0 +1,13 @@
+1 7 cn_proc 4 fast 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__1 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__2 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__3 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__4 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__5 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__6 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__7 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 cn_proc 7 fast__8 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 169 0
+1 7 min_2x1 4 fast 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 47 0
+1 7 mul_2x1 4 fast 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 0 0 41 0
+1 7 cn_core 4 fast 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 917504 0 5425 0
+1 4 ldpc 4 fast 75 /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work 0 0 180224 0 188 0

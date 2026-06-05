@@ -1,0 +1,394 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Thu Jun  4 19:14:11 2026
+# Process ID         : 293841
+# Current directory  : /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1
+# Command line       : vivado -log ldpc.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source ldpc.tcl
+# Log file           : /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1/ldpc.vds
+# Journal file       : /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1/vivado.jou
+# Running On         : victor-IdeaPad-Slim-3-15ARP10
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.4 LTS
+# Processor Detail   : AMD Ryzen 7 7735HS with Radeon Graphics
+# CPU Frequency      : 3031.354 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 14319 MB
+# Swap memory        : 7999 MB
+# Total Virtual      : 22319 MB
+# Available Virtual  : 11436 MB
+#-----------------------------------------------------------
+source ldpc.tcl -notrace
+Command: read_checkpoint -auto_incremental -incremental /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/utils_1/imports/synth_1/cn_core.dcp
+INFO: [Vivado 12-5825] Read reference checkpoint from /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/utils_1/imports/synth_1/cn_core.dcp for incremental synthesis
+INFO: [Vivado 12-7989] Please ensure there are no constraint changes
+Command: synth_design -top ldpc -part xczu7ev-ffvc1156-2-e
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xczu7ev'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xczu7ev'
+INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
+INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 293886
+---------------------------------------------------------------------------------
+Starting Synthesize : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2090.309 ; gain = 462.734 ; free physical = 778 ; free virtual = 9778
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'ldpc' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/ldpc.v:3]
+INFO: [Synth 8-6157] synthesizing module 'cn_core' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_core.v:41]
+	Parameter DEGREE bound to: 19 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+	Parameter sel_mux_cn_proc_3 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_4 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_5 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_6 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_7 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_8 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_9 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_10 bound to: 2'b11 
+	Parameter sel_mux_cn_proc_19 bound to: 2'b00 
+	Parameter sel_demux_min_0 bound to: 4'b1000 
+	Parameter sel_demux_min_1 bound to: 4'b1111 
+	Parameter sel_demux_min_2 bound to: 4'b1111 
+	Parameter sel_demux_mul_0 bound to: 4'b1000 
+	Parameter sel_demux_mul_1 bound to: 4'b1111 
+	Parameter sel_demux_mul_2 bound to: 4'b1111 
+	Parameter sel_demux_min_30 bound to: 1'b0 
+	Parameter sel_demux_min_31 bound to: 1'b0 
+	Parameter sel_demux_mul_30 bound to: 1'b0 
+	Parameter sel_demux_mul_31 bound to: 1'b0 
+INFO: [Synth 8-6157] synthesizing module 'cn_proc' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 3 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized0' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 4 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized0' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized1' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 5 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized1' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized2' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 6 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized2' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized3' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 7 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized3' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized4' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 8 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized4' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized5' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 9 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized5' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized6' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 10 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized6' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized7' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+	Parameter GROUP bound to: 19 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized7' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'min_2x1' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_core.v:4]
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'min_2x1' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_core.v:4]
+INFO: [Synth 8-6157] synthesizing module 'mul_2x1' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_core.v:24]
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mul_2x1' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_core.v:24]
+INFO: [Synth 8-6155] done synthesizing module 'cn_core' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/cn_core.v:41]
+INFO: [Synth 8-6155] done synthesizing module 'ldpc' (0#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/ldpc.v:3]
+WARNING: [Synth 8-7129] Port in_llr_group_1[143] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[142] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[141] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[140] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[139] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[138] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[137] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[136] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[135] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[134] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[133] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[132] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[131] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[130] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[129] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[128] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[127] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[126] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[125] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[124] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[123] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[122] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[121] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[120] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[119] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[118] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[117] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[116] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[115] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[114] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[113] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[112] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[111] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[110] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[109] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[108] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[107] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[106] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[105] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[104] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[103] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[102] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[101] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[100] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[99] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[98] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[97] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[96] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[95] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[94] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[93] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[92] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[91] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[90] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[89] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[88] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[87] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[86] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[85] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[84] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[83] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[82] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[81] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[80] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[79] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[78] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[77] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[76] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[75] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[74] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[73] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[72] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[71] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[70] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[69] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[68] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[67] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[66] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[65] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[64] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[63] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[62] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[61] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[60] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[59] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[58] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[57] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[56] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[55] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[54] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[53] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[52] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[51] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[50] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[49] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[48] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[47] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[46] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[45] in module cn_core is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_llr_group_1[44] in module cn_core is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished Synthesize : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 2181.277 ; gain = 553.703 ; free physical = 668 ; free virtual = 9669
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2199.090 ; gain = 571.516 ; free physical = 675 ; free virtual = 9676
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xczu7ev-ffvc1156-2-e
+INFO: [Device 21-403] Loading part xczu7ev-ffvc1156-2-e
+INFO: [Synth 8-6742] Reading net delay rules and data
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2207.996 ; gain = 580.422 ; free physical = 675 ; free virtual = 9676
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2207.996 ; gain = 580.422 ; free physical = 663 ; free virtual = 9665
+---------------------------------------------------------------------------------
+INFO: [Synth 8-223] decloning instance 'cn_core_19/gen_out_buses_5_6_7_19.mul_0' (mul_2x1) to 'cn_core_19/gen_out_buses_5_6_7_19.mul_1'
+No constraint files found.
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   33 Bit       Adders := 1     
+	   2 Input   32 Bit       Adders := 2     
+	   2 Input    8 Bit       Adders := 62    
++---XORs : 
+	   2 Input      1 Bit         XORs := 1     
+	   3 Input      1 Bit         XORs := 1     
+	   4 Input      1 Bit         XORs := 1     
+	   5 Input      1 Bit         XORs := 1     
+	   6 Input      1 Bit         XORs := 1     
+	   7 Input      1 Bit         XORs := 1     
+	   8 Input      1 Bit         XORs := 1     
+	   9 Input      1 Bit         XORs := 1     
+	  18 Input      1 Bit         XORs := 1     
++---Registers : 
+	              144 Bit    Registers := 3     
++---Muxes : 
+	   2 Input  144 Bit        Muxes := 4     
+	   2 Input    8 Bit        Muxes := 150   
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 1728 (col length:144)
+BRAMs: 624 (col length: RAMB18 144 RAMB36 72)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 3156.152 ; gain = 1528.578 ; free physical = 199 ; free virtual = 8794
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 3156.152 ; gain = 1528.578 ; free physical = 199 ; free virtual = 8794
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 3156.152 ; gain = 1528.578 ; free physical = 198 ; free virtual = 8794
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |BUFG   |     1|
+|2     |CARRY8 |    42|
+|3     |LUT1   |    62|
+|4     |LUT3   |    73|
+|5     |LUT4   |   131|
+|6     |LUT5   |   100|
+|7     |LUT6   |   196|
+|8     |FDCE   |    29|
+|9     |FDRE   |   144|
+|10    |IBUF   |    10|
+|11    |OBUF   |     8|
++------+-------+------+
+
+Report Instance Areas: 
++------+-------------------------------------+--------+------+
+|      |Instance                             |Module  |Cells |
++------+-------------------------------------+--------+------+
+|1     |top                                  |        |   796|
+|2     |  cn_core_19                         |cn_core |   486|
+|3     |    \gen_out_buses_5_6_7_19.mul_out  |mul_2x1 |   486|
++------+-------------------------------------+--------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 576 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.965 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8739
+Synthesis Optimization Complete : Time (s): cpu = 00:00:15 ; elapsed = 00:00:16 . Memory (MB): peak = 3189.973 ; gain = 1562.391 ; free physical = 144 ; free virtual = 8740
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3204.840 ; gain = 0.000 ; free physical = 353 ; free virtual = 8919
+INFO: [Netlist 29-17] Analyzing 53 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3336.328 ; gain = 0.000 ; free physical = 272 ; free virtual = 8839
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 11 instances were transformed.
+  BUFG => BUFGCE: 1 instance 
+  IBUF => IBUF (IBUFCTRL, INBUF): 10 instances
+
+Synth Design complete | Checksum: f8721a4c
+INFO: [Common 17-83] Releasing license: Synthesis
+45 Infos, 100 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:19 ; elapsed = 00:00:18 . Memory (MB): peak = 3336.363 ; gain = 1708.789 ; free physical = 268 ; free virtual = 8835
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2509.959; main = 2463.469; forked = 278.994
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 4150.414; main = 3336.332; forked = 994.258
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3360.340 ; gain = 0.000 ; free physical = 263 ; free virtual = 8830
+INFO: [Common 17-1381] The checkpoint '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1/ldpc.dcp' has been generated.
+INFO: [Vivado 12-24828] Executing command : report_utilization -file ldpc_utilization_synth.rpt -pb ldpc_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Thu Jun  4 19:14:33 2026...

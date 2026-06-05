@@ -1,0 +1,5 @@
+__design_bin_path=/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl
+incr_run_version=16384
+incr_partial_run_stats=0:0
+incr_no_change_stats=0:0
+opt_data_elab=/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/work/@_opt1

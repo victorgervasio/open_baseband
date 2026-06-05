@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Thu Jun  4 19:14:11 2026
+# Process ID         : 293841
+# Current directory  : /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1
+# Command line       : vivado -log ldpc.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source ldpc.tcl
+# Log file           : /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1/ldpc.vds
+# Journal file       : /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.runs/synth_1/vivado.jou
+# Running On         : victor-IdeaPad-Slim-3-15ARP10
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.4 LTS
+# Processor Detail   : AMD Ryzen 7 7735HS with Radeon Graphics
+# CPU Frequency      : 3031.354 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 14319 MB
+# Swap memory        : 7999 MB
+# Total Virtual      : 22319 MB
+# Available Virtual  : 11436 MB
+#-----------------------------------------------------------
+source ldpc.tcl -notrace

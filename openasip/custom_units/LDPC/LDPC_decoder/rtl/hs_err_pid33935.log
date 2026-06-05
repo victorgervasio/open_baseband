@@ -1,0 +1,8 @@
+#
+# An unexpected error has occurred (11) Segmentation fault
+#
+Stack:
+/opt/Xilinx/2025.2/Vivado/tps/lnx64/jre21.0.5_11/lib//server/libjvm.so(+0xe7195c) [0x73f5ee67195c]
+/opt/Xilinx/2025.2/Vivado/tps/lnx64/jre21.0.5_11/lib//server/libjvm.so(JVM_handle_linux_signal+0x23e) [0x73f5ee67242e]
+/lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x73f62e245330]
+[0x4a4c72c0]

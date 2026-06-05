@@ -1,0 +1,111 @@
+synth_design -top ldpc -part xczu7ev-ffvc1156-2-e -lint 
+Command: synth_design -top ldpc -part xczu7ev-ffvc1156-2-e -lint
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xczu7ev'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xczu7ev'
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
+---------------------------------------------------------------------------------
+Starting Synthesize : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 13114.340 ; gain = 0.000 ; free physical = 2223 ; free virtual = 11628
+---------------------------------------------------------------------------------
+Clean up Linter database...
+INFO: [Synth 8-6157] synthesizing module 'ldpc' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/ldpc.v:3]
+INFO: [Synth 8-6157] synthesizing module 'cn_core' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v:41]
+	Parameter DEGREE bound to: 19 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'cn_proc' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 3 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized0' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 4 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized0' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized1' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 5 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized1' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized2' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 6 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized2' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized3' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 7 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized3' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized4' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 8 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized4' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized5' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 9 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized5' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized6' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 10 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized6' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cn_proc__parameterized7' [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+	Parameter GROUP bound to: 19 - type: integer 
+	Parameter WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'cn_proc__parameterized7' (1#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_proc.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'cn_core' (2#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v:41]
+INFO: [Synth 8-6155] done synthesizing module 'ldpc' (3#1) [/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/project_1.srcs/sources_1/imports/new/ldpc.v:3]
+---------------------------------------------------------------------------------
+Finished Synthesize : Time (s): cpu = 00:00:05 ; elapsed = 00:00:04 . Memory (MB): peak = 13114.340 ; gain = 0.000 ; free physical = 2230 ; free virtual = 11635
+---------------------------------------------------------------------------------
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
+| Date         : Thu Jun  4 14:01:21 2026
+| Host         : victor-IdeaPad-Slim-3-15ARP10 running 64-bit Ubuntu 24.04.4 LTS
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+RTL Linter Report
+
+Table of Contents
+-----------------
+1. Summary
+
+1. Summary
+----------
+
++-----------+----------+--------------+----------+
+| Rule ID   | Severity | # Violations | # Waived |
++-----------+----------+--------------+----------+
+| ASSIGN-5  | WARNING  | 1            | 0        |
+| ASSIGN-6  | WARNING  | 6            | 0        |
+| ASSIGN-9  | WARNING  | 1            | 0        |
+| ASSIGN-10 | WARNING  | 4            | 0        |
++-----------+----------+--------------+----------+
+
+
+WARNING: [Synth 37-124] [ASSIGN-5]Some bits in 'out_llr_r' are not set. First unset bit index is 0. 
+RTL Name 'out_llr_r', Hierarchy 'cn_core', File 'cn_core.v', Line 1457.
+WARNING: [Synth 37-93] [ASSIGN-6]Signal 'gen_min_mul_buses_19.out_demux_min_0' was assigned but not read. 
+RTL Name 'gen_min_mul_buses_19.out_demux_min_0', Hierarchy 'cn_core', File '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v', Line 856.
+WARNING: [Synth 37-93] [ASSIGN-6]Signal 'gen_min_mul_buses_19.out_demux_min_1' was assigned but not read. 
+RTL Name 'gen_min_mul_buses_19.out_demux_min_1', Hierarchy 'cn_core', File '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v', Line 857.
+WARNING: [Synth 37-93] [ASSIGN-6]Signal 'gen_min_mul_buses_19.out_demux_min_2' was assigned but not read. 
+RTL Name 'gen_min_mul_buses_19.out_demux_min_2', Hierarchy 'cn_core', File '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v', Line 858.
+WARNING: [Synth 37-93] [ASSIGN-6]Signal 'gen_min_mul_buses_19.out_demux_mul_0' was assigned but not read. 
+RTL Name 'gen_min_mul_buses_19.out_demux_mul_0', Hierarchy 'cn_core', File '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v', Line 859.
+WARNING: [Synth 37-93] [ASSIGN-6]Signal 'gen_min_mul_buses_19.out_demux_mul_1' was assigned but not read. 
+RTL Name 'gen_min_mul_buses_19.out_demux_mul_1', Hierarchy 'cn_core', File '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v', Line 860.
+WARNING: [Synth 37-93] [ASSIGN-6]Signal 'gen_min_mul_buses_19.out_demux_mul_2' was assigned but not read. 
+RTL Name 'gen_min_mul_buses_19.out_demux_mul_2', Hierarchy 'cn_core', File '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/new/cn_core.v', Line 861.
+WARNING: [Synth 37-126] [ASSIGN-9]Some bits in IO 'out_llr' are not set. First unset bit index is 0. 
+RTL Name 'out_llr', Hierarchy 'cn_core', File 'cn_core.v', Line 50.
+WARNING: [Synth 37-125] [ASSIGN-10]Some bits in IO 'sel_demux_min_30' are not read. First unread bit index is 0. 
+RTL Name 'sel_demux_min_30', Hierarchy 'cn_core', File 'cn_core.v', Line 70.
+WARNING: [Synth 37-125] [ASSIGN-10]Some bits in IO 'sel_demux_min_31' are not read. First unread bit index is 0. 
+RTL Name 'sel_demux_min_31', Hierarchy 'cn_core', File 'cn_core.v', Line 71.
+WARNING: [Synth 37-125] [ASSIGN-10]Some bits in IO 'sel_demux_mul_30' are not read. First unread bit index is 0. 
+RTL Name 'sel_demux_mul_30', Hierarchy 'cn_core', File 'cn_core.v', Line 73.
+WARNING: [Synth 37-125] [ASSIGN-10]Some bits in IO 'sel_demux_mul_31' are not read. First unread bit index is 0. 
+RTL Name 'sel_demux_mul_31', Hierarchy 'cn_core', File 'cn_core.v', Line 74.
+INFO: [Synth 37-85] Total of 12 linter message(s) generated.
+INFO: [Synth 37-45] Linter Run Finished!
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:05 ; elapsed = 00:00:04 . Memory (MB): peak = 13114.340 ; gain = 0.000 ; free physical = 2220 ; free virtual = 11625
+INFO: [Common 17-83] Releasing license: Synthesis
+27 Infos, 12 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully

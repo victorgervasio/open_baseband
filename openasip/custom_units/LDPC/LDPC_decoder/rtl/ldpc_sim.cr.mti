@@ -1,0 +1,9 @@
+/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/cn_proc.v {1 {vlog -work work -vopt -stats=none /home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/cn_proc.v
+Questa Altera Starter FPGA Edition-64 vlog 2025.2 Compiler 2025.05 May 31 2025
+** Note: (vlog-220) '/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/ldpc_sim.mpf' is used as the ini file.
+-- Compiling module cn_proc
+
+Top level modules:
+	cn_proc
+
+} {} {}}

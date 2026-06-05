@@ -1,0 +1,5 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/tmp/v5MuyQK/5/cn_core.v" into library work
+INFO: [VRFC 10-311] analyzing module cn_proc
+INFO: [VRFC 10-311] analyzing module min_2x1
+INFO: [VRFC 10-311] analyzing module mul_2x1
+INFO: [VRFC 10-311] analyzing module cn_core
