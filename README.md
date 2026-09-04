@@ -56,31 +56,7 @@ open\_baseband
 │       │       │           │   └── norm\_dist.h
 │       │       │           ├── LDPC.cpp
 │       │       │           ├── main.cpp
-│       │       │           └── nrLDPCTables.cpp
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
+│       │       │           └── nrLDPCTables.cpp     
 │       │       └── common
 │       │           └── lib
 │       │               └── cpp
