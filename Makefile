@@ -9,9 +9,9 @@ SHELL := /bin/bash
 
 ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 OPENASIP_DIR := $(ROOT_DIR)/openasip
-BUILD_ROOT ?= $(ROOT_DIR)/build
+BUILD_ROOT ?= $(ROOT_DIR)/build/openasip
 OPENASIP_TARGET ?= all
-BUILD_DIR ?= $(BUILD_ROOT)/$(OPENASIP_TARGET)
+BUILD_DIR ?= $(BUILD_ROOT)/build-$(OPENASIP_TARGET)
 
 # OpenASIP environment.  tce-env.sh is kept in the repository under config.
 TCE_ENV ?= $(OPENASIP_DIR)/config/tce-env.sh
