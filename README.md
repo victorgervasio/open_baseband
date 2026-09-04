@@ -1,13 +1,13 @@
 Current project file tree:
 
 ```bash
-open\_baseband
+open_baseband
 ├── CMakeLists.txt
 ├── LICENSE
 ├── Makefile
 ├── openasip
 │   ├── arch
-│   │   ├── 5gnr\_ue\_baseband\_proc.adf
+│   │   ├── 5gnr_ue_baseband_proc.adf
 │   │   └── rtl
 │   │       └── CMakeLists.txt
 │   ├── CMakeLists.txt
@@ -16,7 +16,7 @@ open\_baseband
 │   ├── sim
 │   │   ├── CMakeLists.txt
 │   │   ├── post-proc
-│   │   │   └── gen\_dataset.py
+│   │   │   └── gen_dataset.py
 │   │   ├── requirements.txt
 │   │   └── sim.py
 │   └── targets
@@ -46,45 +46,21 @@ open\_baseband
 │       │       │       │   └── LDPC.h
 │       │       │       └── src
 │       │       │           ├── gen-n0
-│       │       │           │   ├── gen\_n0\_table.cpp
-│       │       │           │   ├── gen\_n0\_table.sh
-│       │       │           │   └── n0\_table.h
+│       │       │           │   ├── gen_n0_table.cpp
+│       │       │           │   ├── gen_n0_table.sh
+│       │       │           │   └── n0_table.h
 │       │       │           ├── gen-random
-│       │       │           │   ├── generate\_random\_samples.cpp
-│       │       │           │   ├── generate\_random\_samples.sh
-│       │       │           │   ├── normal\_samples.h
-│       │       │           │   └── norm\_dist.h
+│       │       │           │   ├── generate_random_samples.cpp
+│       │       │           │   ├── generate_random_samples.sh
+│       │       │           │   ├── normal_samples.h
+│       │       │           │   └── norm_dist.h
 │       │       │           ├── LDPC.cpp
 │       │       │           ├── main.cpp
 │       │       │           └── nrLDPCTables.cpp
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
-│       │       │           
 │       │       └── common
 │       │           └── lib
 │       │               └── cpp
-│       └── x86\_64
+│       └── x86_64
 │           └── kernels
 │               ├── 5gnr
 │               │   └── ldpc
@@ -94,14 +70,14 @@ open\_baseband
 │               │       │   └── LDPC.h
 │               │       └── src
 │               │           ├── gen-n0
-│               │           │   ├── gen\_n0\_table.cpp
-│               │           │   ├── gen\_n0\_table.sh
-│               │           │   └── n0\_table.h
+│               │           │   ├── gen_n0_table.cpp
+│               │           │   ├── gen_n0_table.sh
+│               │           │   └── n0_table.h
 │               │           ├── gen-random
-│               │           │   ├── generate\_random\_samples.cpp
-│               │           │   ├── generate\_random\_samples.sh
-│               │           │   ├── normal\_samples.h
-│               │           │   └── norm\_dist.h
+│               │           │   ├── generate_random_samples.cpp
+│               │           │   ├── generate_random_samples.sh
+│               │           │   ├── normal_samples.h
+│               │           │   └── norm_dist.h
 │               │           ├── LDPC.cpp
 │               │           ├── main.cpp
 │               │           └── nrLDPCTables.cpp
