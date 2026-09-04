@@ -1,5 +1,10 @@
-rtl/
 temp/
-sdk/*
-!sdk/Makefile
-qcom/
+#sdk/*
+#!sdk/Makefile
+#qcom/
+#doc/
+old/
+build/
+openasip/targets/common/kernels/lib/cpp/etl/
+openasip/sim/venv/
+openasip/sim/log/

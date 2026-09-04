@@ -1,7 +1,0 @@
-0.7
-2020.2
-Nov 14 2025
-12:36:23
-/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/cn_proc.v,1777702468,verilog,,,,cn_proc,,,,,,,,
-/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/defines.vh,1777822085,verilog,,,,,,,,,,,,
-/tmp/v5MuyQK/5/cn_core.v,1780621757,verilog,,,/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/defines.vh;/home/victor/open_baseband/openasip/custom_units/LDPC/LDPC_decoder/rtl/cn_proc.v,cn_core;min_2x1;mul_2x1,,,,,,,,
