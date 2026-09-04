@@ -1,5 +1,6 @@
 Current project file tree:
 
+```bash
 open\_baseband
 ├── CMakeLists.txt
 ├── LICENSE
@@ -55,31 +56,31 @@ open\_baseband
 │       │       │           │   └── norm\_dist.h
 │       │       │           ├── LDPC.cpp
 │       │       │           ├── main.cpp
-│       │       │           ├── nrLDPCTables.cpp
-│       │       │           └── temp
-│       │       │               ├── compiling\_tests
-│       │       │               │   └── llvm\_background
-│       │       │               │       ├── large.ll
-│       │       │               │       ├── memset2.cpp
-│       │       │               │       ├── memset2.ll
-│       │       │               │       ├── memset.cpp
-│       │       │               │       ├── rint2.cpp
-│       │       │               │       ├── rint3.cpp
-│       │       │               │       ├── rint4.cpp
-│       │       │               │       ├── rint5.cpp
-│       │       │               │       └── rint.cpp
-│       │       │               ├── dev-support
-│       │       │               │   ├── headers\_test.cpp
-│       │       │               │   └── headers\_test.sh
-│       │       │               └── openasip\_tools
-│       │       │                   ├── compile
-│       │       │                   │   ├── host\_compile.sh
-│       │       │                   │   └── oacc\_compile.sh
-│       │       │                   ├── debug
-│       │       │                   │   └── foo.py
-│       │       │                   └── simulate
-│       │       │                       ├── proxim\_simulate.sh
-│       │       │                       └── ttasim\_simulate.sh
+│       │       │           └── nrLDPCTables.cpp
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
+│       │       │           
 │       │       └── common
 │       │           └── lib
 │       │               └── cpp
@@ -106,8 +107,6 @@ open\_baseband
 │               │           └── nrLDPCTables.cpp
 │               └── lib
 │                   └── cpp
-├── README.md
-└── temp
-    └── structure.txt
+└── README.md
 
 52 directories, 57 files
