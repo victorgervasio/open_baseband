@@ -282,7 +282,7 @@ def write_operation_csv(operation, measurements, output_dir):
 def main():
 
     parser = argparse.ArgumentParser(
-        description="Extract TTA simulation operation timings from term.log"
+        description="Extract TTA/x86_64 simulation operation timings from term.log"
     )
 
     parser.add_argument(
@@ -295,7 +295,7 @@ def main():
         "-o",
         "--output-dir",
         type=Path,
-        default=Path("csv"),
+        required=True,
         help="Directory where CSV files will be created"
     )
 

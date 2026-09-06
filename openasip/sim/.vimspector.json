@@ -1,0 +1,65 @@
+{
+  "configurations": {
+    "Python: Debug sim.py (tta) - open_baseband/openasip/sim venv": {
+      "adapter": "debugpy",
+      "breakpoints": {
+        "exception": {
+          "raised": "N",
+          "uncaught": "Y",
+          "userUnhandled": "N"
+        }
+      },
+      "configuration": {
+        "python": "../../build/openasip/sim/venv/bin/python3",
+        "request": "launch",
+        "type": "python",
+        "cwd": "${workspaceRoot}",
+        "program": "sim.py",
+        "args": [
+            "--target", "tta",
+            "--simulator", "ttasim",
+            "--adf_file", "../arch/5gnr_ue_baseband_proc_sim.adf",
+            "--tpef_file", "../../build/openasip/build-tta/openasip/targets/tta/sim/kernels/${tech}/${kernel}/${tech}_${kernel}_sim.tpef",
+            "--sim_root", "../../build/openasip/build-tta/openasip/sim"
+        ],
+        "console": "integratedTerminal",
+        "breakpoints": {
+          "exception": {
+            "all": "N",
+            "uncaught": "Y"
+          }
+        },
+        "stopOnEntry": false
+      }
+    },
+    "Python: Debug sim.py (x86_64) - open_baseband/openasip/sim venv": {
+      "adapter": "debugpy",
+      "breakpoints": {
+        "exception": {
+          "raised": "N",
+          "uncaught": "Y",
+          "userUnhandled": "N"
+        }
+      },
+      "configuration": {
+        "python": "../../build/openasip/sim/venv/bin/python3",
+        "request": "launch",
+        "type": "python",
+        "cwd": "${workspaceRoot}",
+        "program": "sim.py",
+        "args": [
+            "--target", "x86_64",
+            "--x86_64_program", "../../build/openasip/build-x86_64/openasip/targets/x86_64/kernels/${tech}/${kernel}/${tech}_${kernel}"
+        ],
+        "console": "integratedTerminal",
+        "breakpoints": {
+          "exception": {
+            "all": "N",
+            "uncaught": "Y"
+          }
+        },
+        "stopOnEntry": false
+      }
+    }
+  }
+}
