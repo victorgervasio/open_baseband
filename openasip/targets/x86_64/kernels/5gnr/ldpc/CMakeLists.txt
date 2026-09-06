@@ -1,5 +1,4 @@
 set(KERNEL_TARGET "x86_64-ldpc")
-set(KERNEL_SIM_TARGET "x86_64-ldpc-sim")
 set(KERNEL_NAME "5gnr_ldpc")
 
 set(x86_64_PROGRAM "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_TARGET}")
@@ -36,10 +35,6 @@ target_link_options(${KERNEL_TARGET}
         $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 
-# simulation
-add_custom_target(${KERNEL_SIM_TARGET} DEPENDS "${x86_64_PROGRAM}")
-add_custom_target(simulate-x86_64 DEPENDS ${KERNEL_SIM_TARGET})
-
 # sim.py creates the timestamped experiment log and captures the simulator
 # output. The simulator is selected explicitly so `make ttasim` and
 # `make proxim` cannot accidentally run the other simulator.
@@ -49,7 +44,7 @@ add_custom_target(simulate-x86_64-ldpc
             --target x86_64
             --sim_root "${SIM_OUTPUT_DIR}"
             --x86_64_program "${x86_64_PROGRAM}"
-    DEPENDS ${KERNEL_SIM_TARGET}
+    DEPENDS ${KERNEL_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     USES_TERMINAL
 )
@@ -61,7 +56,7 @@ add_custom_target(test-x86_64-ldpc
             --target x86_64
             --sim_root "${SIM_OUTPUT_DIR}"
             --x86_64_program "${x86_64_PROGRAM}"
-    DEPENDS ${KERNEL_SIM_TARGET}
+    DEPENDS ${KERNEL_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     USES_TERMINAL
 )
