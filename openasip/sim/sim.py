@@ -8,8 +8,6 @@ import sys
 import traceback
 import json
 
-from lib.post_proc import gen_dataset
-
 _script_dir_path = Path(__file__).parent.resolve()
 
 def get_git_info():
