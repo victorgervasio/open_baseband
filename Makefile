@@ -12,6 +12,8 @@ OPENASIP_DIR := $(ROOT_DIR)/openasip
 BUILD_ROOT ?= $(ROOT_DIR)/build/openasip
 OPENASIP_TARGET ?= all
 BUILD_DIR ?= $(BUILD_ROOT)/build-$(OPENASIP_TARGET)
+SIM_OUTPUT_DIR ?= $(BUILD_DIR)/openasip/sim
+DATASET_LOG_DIR ?= # to generate dataset for specific target's log (default is the latest)
 
 # OpenASIP environment.  tce-env.sh is kept in the repository under config.
 TCE_ENV ?= $(OPENASIP_DIR)/config/tce-env.sh
@@ -28,20 +30,27 @@ ETL_INSTALL_DIR ?= $(ETL_ROOT)/install
 SIMULATOR ?= ttasim
 
 # Python environment used by the OpenASIP simulation scripts.
-SIM_DIR ?= $(OPENASIP_DIR)/sim
-SIM_VENV ?= $(SIM_DIR)/venv
-SIM_PYTHON ?= $(SIM_VENV)/bin/python
-SIM_REQUIREMENTS ?= $(SIM_DIR)/requirements.txt
+SIM_SOURCE_DIR ?= $(OPENASIP_DIR)/sim
+SIM_BUILD_DIR ?= $(BUILD_ROOT)/sim
+SIM_VENV ?= $(SIM_BUILD_DIR)/venv
+SIM_PYTHON ?= $(SIM_VENV)/bin/python3
+SIM_REQUIREMENTS ?= $(SIM_SOURCE_DIR)/requirements.txt
+
+# OpenASIP processor Hardware Description Language.
+RTL_HDL ?= vhdl
 
 CMAKE ?= cmake
 GIT ?= git
 
 .PHONY: all build configure ensure-etl ensure-sim-venv
 .PHONY: build-tta build-x86_64 build-almaif
+.PHONY: build-tta-sim build-tta-asic
 .PHONY: tta x86_64 almaif
 .PHONY: simulate simulate-tta simulate-x86_64 simulate-almaif
 .PHONY: ttasim proxim
-.PHONY: rtl dataset analyze
+.PHONY: verilog-rtl vhdl-rtl 
+.PHONY: dataset-tta dataset-x86_64 dataset-almaif dataset
+.PHONY: analyze-tta analyze-x86_64 analyze-almaif analyze
 .PHONY: clean distclean test test-tta test-x86_64 test-almaif
 .PHONY: format lint help
 
@@ -66,7 +75,6 @@ build: configure
 	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-all
 
 configure: ensure-etl ensure-sim-venv
-configure: ensure-etl ensure-sim-venv
 	$(SOURCE_TCE)
 	$(CMAKE) -S "$(ROOT_DIR)" -B "$(BUILD_DIR)" \
 		-DETL_ROOT="$(ETL_ROOT)" \
@@ -74,7 +82,10 @@ configure: ensure-etl ensure-sim-venv
 		-DTCE_ENV="$(TCE_ENV)" \
 		-DSIMULATOR="$(SIMULATOR)" \
 		-DOPENASIP_TARGET="$(OPENASIP_TARGET)" \
-		-DPython3_EXECUTABLE="$(SIM_PYTHON)"
+		-DPython3_EXECUTABLE="$(SIM_PYTHON)" \
+		-DRTL_HDL="$(RTL_HDL)" \
+		-DSIM_OUTPUT_DIR="$(SIM_OUTPUT_DIR)" \
+		-DDATASET_LOG_DIR="$(DATASET_LOG_DIR)"
 
 # Clone and build/install ETL locally.  CMake configuration of open_baseband
 # depends on this target so `make`, `make all`, and every build-* target are
@@ -138,6 +149,16 @@ build-tta: configure
 	$(SOURCE_TCE)
 	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target tta-build
 
+build-tta-sim: OPENASIP_TARGET=tta
+build-tta-sim: configure
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target sim-tta-build
+
+build-tta-asic: OPENASIP_TARGET=tta
+build-tta-asic: configure
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target asic-tta-build
+
 build-x86_64: OPENASIP_TARGET=x86_64
 build-x86_64: configure
 	$(SOURCE_TCE)
@@ -193,14 +214,38 @@ proxim: configure
 	$(SOURCE_TCE)
 	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target proxim
 
-rtl: OPENASIP_TARGET=tta
-rtl: configure
+verilog-rtl: OPENASIP_TARGET=tta
+verilog-rtl: RTL_HDL=verilog
+verilog-rtl: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target rtl
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target verilog-rtl
 
+vhdl-rtl: OPENASIP_TARGET=tta
+vhdl-rtl: RTL_HDL=vhdl
+vhdl-rtl: configure
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target vhdl-rtl
+
+dataset-tta: OPENASIP_TARGET=tta
+dataset-tta: configure
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-tta
+
+dataset-x86_64: OPENASIP_TARGET=x86_64
+dataset-x86_64: configure
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-x86_64
+
+dataset-almaif: OPENASIP_TARGET=almaif
+dataset-almaif: configure
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-almaif
+
+build: BUILD_DIR=$(BUILD_ROOT)/all
+build: OPENASIP_TARGET=all
 dataset: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-all
 
 analyze: configure
 	$(SOURCE_TCE)
@@ -253,6 +298,8 @@ help:
 	@echo "  make / make all          Configure dependencies and build everything"
 	@echo "  make build               Build everything"
 	@echo "  make build-tta           Build TTA target"
+	@echo "  make build-tta-sim       Build TTA target compiling simulation kernels"
+	@echo "  make build-tta-asic      Build TTA target compiling asic kernels"
 	@echo "  make build-x86_64        Build x86_64 target"
 	@echo "  make build-almaif        Build ALMAIF target"
 	@echo "  make tta                 Build TTA and run it"
@@ -261,7 +308,8 @@ help:
 	@echo "  make simulate[-<target>] Run an already configured simulation target"
 	@echo "  make ttasim              Run TTA with ttasim"
 	@echo "  make proxim              Run TTA with Proxim"
-	@echo "  make rtl                Generate processor RTL"
+	@echo "  make verilog-rtl         Generate processor RTL in Verilog"
+	@echo "  make vhdl-rtl            Generate processor RTL in VHDL"
 	@echo "  make dataset             Generate timing CSVs"
 	@echo "  make analyze             Run analysis"
 	@echo "  make test[-<target>]     Run correctness tests"

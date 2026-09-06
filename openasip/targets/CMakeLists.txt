@@ -5,19 +5,20 @@ if(OPENASIP_TARGET STREQUAL "all")
     add_custom_target(test)
 endif()
 
-
 if(OPENASIP_TARGET STREQUAL "tta" OR OPENASIP_TARGET STREQUAL "all")
     add_custom_target(tta-build)
     add_custom_target(tta)
     add_custom_target(test-tta)
 
-    add_subdirectory(tta/kernels/5gnr/ldpc)
+    add_subdirectory(tta/sim/kernels/5gnr/ldpc)
+    add_subdirectory(tta/asic/kernels/5gnr/ldpc)
 
-    add_dependencies(tta-build tta-ldpc)
-    add_dependencies(tta tta-ldpc simulate-tta)
+    add_dependencies(tta-build sim-tta-build asic-tta-build)
+
+    add_dependencies(tta sim-tta-build simulate-tta)
+
     add_dependencies(test-tta tta)
 endif()
-
 
 if(OPENASIP_TARGET STREQUAL "x86_64" OR OPENASIP_TARGET STREQUAL "all")
     add_custom_target(x86_64-build)

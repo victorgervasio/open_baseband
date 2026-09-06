@@ -1,15 +1,10 @@
-set(KERNEL_TARGET "tta-ldpc")
+set(KERNEL_TARGET "tta-ldpc-sim")
 set(KERNEL_NAME "5gnr_ldpc")
 
-set(ADF_FILE
-    "${CMAKE_CURRENT_LIST_DIR}/../../../../../arch/5gnr_ue_baseband_proc.adf")
-
-set(TPEF_FILE
-    "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}.tpef")
-
-file(GLOB_RECURSE LDPC_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-)
+set(SIM_ADF_FILE "${CMAKE_CURRENT_LIST_DIR}/../../../../../../arch/5gnr_ue_baseband_proc_sim.adf")
+set(SIM_TPEF_FILE "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}_sim.tpef")
+file(GLOB_RECURSE LDPC_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+# set(SIM_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../../../../../sim")
 
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-n0/")
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-random/")
@@ -34,7 +29,7 @@ set(TTA_INCLUDE_FLAGS
 )
 
 add_custom_command(
-    OUTPUT "${TPEF_FILE}"
+    OUTPUT "${SIM_TPEF_FILE}"
     COMMAND "${OACC_EXECUTABLE}"
             --swfp
             -V
@@ -42,17 +37,18 @@ add_custom_command(
             -O3
             ${TTA_INCLUDE_FLAGS}
             ${LDPC_SOURCES}
-            -a "${ADF_FILE}"
-            -o "${TPEF_FILE}"
+            -a "${SIM_ADF_FILE}"
+            -o "${SIM_TPEF_FILE}"
     DEPENDS
         ${LDPC_SOURCES}
-        "${ADF_FILE}"
+        "${SIM_ADF_FILE}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMENT "Compiling ${KERNEL_NAME} for the OpenASIP TTA"
+    COMMENT "Compiling ${KERNEL_NAME} for the OpenASIP TTA simulation architecture"
     VERBATIM
 )
 
-add_custom_target(${KERNEL_TARGET} DEPENDS "${TPEF_FILE}")
+add_custom_target(${KERNEL_TARGET} DEPENDS "${SIM_TPEF_FILE}")
+add_custom_target(sim-tta-build DEPENDS ${KERNEL_TARGET})
 
 # sim.py creates the timestamped experiment log and captures the simulator
 # output. The simulator is selected explicitly so `make ttasim` and
@@ -60,9 +56,11 @@ add_custom_target(${KERNEL_TARGET} DEPENDS "${TPEF_FILE}")
 add_custom_target(simulate-tta-ldpc
     COMMAND "${Python3_EXECUTABLE}"
             "${OPENBASEBAND_SIM_PY}"
+            --target tta
             --simulator "${SIMULATOR}"
-            --adf-file "${ADF_FILE}"
-            --tpef-file "${TPEF_FILE}"
+            --adf_file "${SIM_ADF_FILE}"
+            --tpef_file "${SIM_TPEF_FILE}"
+            --sim_root "${SIM_OUTPUT_DIR}"
     DEPENDS ${KERNEL_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     USES_TERMINAL
@@ -72,9 +70,11 @@ add_dependencies(simulate-tta simulate-tta-ldpc)
 add_custom_target(simulate-tta-ttasim-ldpc
     COMMAND "${Python3_EXECUTABLE}"
             "${OPENBASEBAND_SIM_PY}"
+            --target tta
             --simulator ttasim
-            --adf-file "${ADF_FILE}"
-            --tpef-file "${TPEF_FILE}"
+            --adf_file "${SIM_ADF_FILE}"
+            --tpef_file "${SIM_TPEF_FILE}"
+            --sim_root "${SIM_OUTPUT_DIR}"
     DEPENDS ${KERNEL_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     USES_TERMINAL
@@ -84,9 +84,11 @@ add_dependencies(ttasim simulate-tta-ttasim-ldpc)
 add_custom_target(simulate-tta-proxim-ldpc
     COMMAND "${Python3_EXECUTABLE}"
             "${OPENBASEBAND_SIM_PY}"
+            --target tta
             --simulator proxim
-            --adf-file "${ADF_FILE}"
-            --tpef-file "${TPEF_FILE}"
+            --adf_file "${SIM_ADF_FILE}"
+            --tpef_file "${SIM_TPEF_FILE}"
+            --sim_root "${SIM_OUTPUT_DIR}"
     DEPENDS ${KERNEL_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     USES_TERMINAL
@@ -96,9 +98,11 @@ add_dependencies(proxim simulate-tta-proxim-ldpc)
 add_custom_target(test-tta-ldpc
     COMMAND "${Python3_EXECUTABLE}"
             "${OPENBASEBAND_SIM_PY}"
+            --target tta
             --simulator "${SIMULATOR}"
-            --adf-file "${ADF_FILE}"
-            --tpef-file "${TPEF_FILE}"
+            --adf_file "${SIM_ADF_FILE}"
+            --tpef_file "${SIM_TPEF_FILE}"
+            --sim_root "${SIM_OUTPUT_DIR}"
     DEPENDS ${KERNEL_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     USES_TERMINAL
