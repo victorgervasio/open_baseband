@@ -41,6 +41,7 @@ RTL_HDL ?= vhdl
 
 CMAKE ?= cmake
 GIT ?= git
+CMAKE_BUILD_TYPE ?= Release # RelWithDebInfo for getting debug symbols
 
 .PHONY: all build configure ensure-etl ensure-sim-venv
 .PHONY: build-tta build-x86_64 build-almaif
@@ -85,7 +86,8 @@ configure: ensure-etl ensure-sim-venv
 		-DPython3_EXECUTABLE="$(SIM_PYTHON)" \
 		-DRTL_HDL="$(RTL_HDL)" \
 		-DSIM_OUTPUT_DIR="$(SIM_OUTPUT_DIR)" \
-		-DDATASET_LOG_DIR="$(DATASET_LOG_DIR)"
+		-DDATASET_LOG_DIR="$(DATASET_LOG_DIR)" \
+		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)"
 
 # Clone and build/install ETL locally.  CMake configuration of open_baseband
 # depends on this target so `make`, `make all`, and every build-* target are
