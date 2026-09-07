@@ -1,5 +1,5 @@
 #include "LDPC.h"
-
+//3GPP TS 38.212 - Table 5.3.2-1: Sets of LDPC lifting size Z
 extern const uint16_t liftSizeTable[8][8]=
         {   {2, 	4,	8,	16,	32,	64,	128,256},
             {3, 	6,	12,	24,	48,	96,	192,384},
@@ -10,7 +10,7 @@ extern const uint16_t liftSizeTable[8][8]=
             {13,	26,	52,	104,208,0,	0,	0  },
             {15,	30,	60,	120,240,0,	0,	0  }  };
 
-
+//3GPP TS 38.212 - Table 5.3.2-2: LDPC base graph 1 and its parity check matrices
 extern const uint16_t shiftTableBgn_1 [316][10] =
         {	{0, 0,   	250,   	307,   	73,   	223,   	211,   	294,   	0,   	135   	},
              {0, 1,   	69,   	19,   	15,   	16,   	198,   	118,   	0,   	227   	},
@@ -329,6 +329,7 @@ extern const uint16_t shiftTableBgn_1 [316][10] =
              {45, 10,   	167,   	15,   	126,   	29,   	144,   	235,   	153,   	93   	},
              {45, 67,   	0,   	0,   	0,   	0,   	0,   	0,   	0,   	0,    	}, };
 
+//3GPP TS 38.212 - Table 5.3.2-2: LDPC base graph 2 and its parity check matrices
 extern const uint16_t shiftTableBgn_2 [197][10] =
         {   {	0,	0,   	9,   	174,   	0,   	72,   	3,   	156,   	143,   	145	},
             {	0,	1,   	117,   	97,   	0,   	110,   	26,   	143,   	19,   	131	},

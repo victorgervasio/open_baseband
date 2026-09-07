@@ -10,6 +10,10 @@ list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-n0/")
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-random/")
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/temp/")
 
+# nrLDPCTables.cpp contains the definitions of the 5G NR LDPC 
+# lifting-size and shift tables used by LDPC.cpp. 
+set(LDPC_COMMON_SOURCES "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src/nrLDPCTables.cpp")
+
 find_program(OACC_EXECUTABLE oacc)
 if(NOT OACC_EXECUTABLE)
     message(FATAL_ERROR
@@ -20,6 +24,8 @@ endif()
 # include layouts are retained because the OpenASIP-compatible ETL fork used
 # by this project exposes headers through both paths.
 set(TTA_INCLUDE_FLAGS
+    "-I${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/include"
+    "-I${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src"
     "-I${ETL_ROOT}/include"
     #    "-I${ETL_ROOT}/etl/include"
     "-I${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -37,10 +43,12 @@ add_custom_command(
             -O3
             ${TTA_INCLUDE_FLAGS}
             ${LDPC_SOURCES}
+            ${LDPC_COMMON_SOURCES}
             -a "${SIM_ADF_FILE}"
             -o "${SIM_TPEF_FILE}"
     DEPENDS
         ${LDPC_SOURCES}
+        ${LDPC_COMMON_SOURCES}
         "${SIM_ADF_FILE}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMENT "Compiling ${KERNEL_NAME} for the OpenASIP TTA simulation architecture"

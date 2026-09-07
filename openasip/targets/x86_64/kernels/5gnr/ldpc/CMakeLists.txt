@@ -1,5 +1,4 @@
 set(KERNEL_TARGET "x86_64-ldpc")
-set(KERNEL_NAME "5gnr_ldpc")
 
 set(x86_64_PROGRAM "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_TARGET}")
 
@@ -13,10 +12,15 @@ list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-n0/")
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-random/")
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/temp/")
 
-add_executable(${KERNEL_TARGET} ${LDPC_SOURCES})
+# nrLDPCTables.cpp contains the definitions of the 5G NR LDPC 
+# lifting-size and shift tables used by LDPC.cpp. 
+set(LDPC_COMMON_SOURCES "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src/nrLDPCTables.cpp")
+add_executable(${KERNEL_TARGET} ${LDPC_SOURCES} ${LDPC_COMMON_SOURCES} )
 
 target_include_directories(${KERNEL_TARGET}
     PRIVATE
+        "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/include"
+        "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src"
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${ETL_ROOT}/include"
         "${ETL_ROOT}/etl/include"
@@ -25,7 +29,10 @@ target_include_directories(${KERNEL_TARGET}
 
 target_compile_options(${KERNEL_TARGET}
     PRIVATE
-        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Debug>:-g3> # -g3 for more info on debugging, such as macro debugging info
+        $<$<CONFIG:RelWithDebInfo>:-g3>
+        $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>
+
         $<$<CONFIG:Debug>:-fsanitize=address,undefined>
         $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
 )
