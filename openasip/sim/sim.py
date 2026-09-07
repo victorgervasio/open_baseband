@@ -65,7 +65,9 @@ def run_subprocess(logger,cmd):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            bufsize=1
+            bufsize=1,
+            encoding="utf-8",
+            errors="replace"
         )
 
         for line in process.stdout:
@@ -80,6 +82,11 @@ def run_subprocess(logger,cmd):
 
         logger.warning(fr"Subprocess ended with error! (Code {ret_code}")
         return False, ret_code
+    
+    except UnicodeDecodeError:
+        logger.exception("Subprocess ended with unexpected error!")
+        logger.exception(traceback.print_exc())
+        return False, -1
 
     except Exception as e:
         logger.exception("Subprocess ended with unexpected error!")
