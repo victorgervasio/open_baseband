@@ -2,19 +2,19 @@ An open-source "end-to-end" 5GNR baseband processor project, implementing
 L1 (Physical Layer) kernels.
 
 Current architecture:
-![Failed to load](doc/img/arch/5gnr_ue_baseband_proc_sim_1.png)
-![Failed to load](doc/img/arch/5gnr_ue_baseband_proc_sim_2.png)
-![Failed to load](doc/img/arch/5gnr_ue_baseband_proc_sim_3.png)
+<img src="doc/img/arch/5gnr_ue_baseband_proc_sim_1.png" width="100%">
+<img src="doc/img/arch/5gnr_ue_baseband_proc_sim_2.png" width="100%">
+<img src="doc/img/arch/5gnr_ue_baseband_proc_sim_3.png" width="100%">
 
 Processor simulation (Proxim) window (paused during LDPC code/decode simulation):
-![Failed to load](doc/img/sim/proxim_5gnr_ue_baseband_proc_sim.png)
+<img src="doc/img/sim/proxim_5gnr_ue_baseband_proc_sim.png" width="100%">
 
 Machine View and Processor utilization stats (paused LDPC code/decode simulation):
-![Failed to load](doc/img/sim/machine_window_5gnr_ue_baseband_proc_sim.png)
-![Failed to load](doc/img/sim/machine_window_5gnr_ue_baseband_proc_sim_1.png)
-![Failed to load](doc/img/sim/machine_window_5gnr_ue_baseband_proc_sim_1.png)
-![Failed to load](doc/img/sim/machine_window_5gnr_ue_baseband_proc_sim_1.png)
-![Failed to load](doc/img/sim/machine_window_5gnr_ue_baseband_proc_sim_1.png)
+<img src="doc/sim/machine_window_5gnr_ue_baseband_proc_sim.png" width="100%">
+<img src="doc/sim/machine_window_5gnr_ue_baseband_proc_sim_1.png" width="100%">
+<img src="doc/sim/machine_window_5gnr_ue_baseband_proc_sim_2.png" width="100%">
+<img src="doc/sim/machine_window_5gnr_ue_baseband_proc_sim_3.png" width="100%">
+<img src="doc/sim/machine_window_5gnr_ue_baseband_proc_sim_4.png" width="100%">
 
 ```bash
 >info proc stats
