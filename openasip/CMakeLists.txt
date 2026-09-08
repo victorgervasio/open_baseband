@@ -1,5 +1,4 @@
 # Top-level CMake description for the OpenASIP portion of open_baseband.
-
 set(OPENASIP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(NOT DEFINED Python3_EXECUTABLE)
@@ -23,18 +22,9 @@ if(NOT EXISTS "${ETL_ROOT}")
 endif()
 
 # Select which OpenASIP target is being configured.
-set(OPENASIP_TARGET "" CACHE STRING
-    "OpenASIP target to configure: tta, x86_64, almaif, all")
-
-set_property(CACHE OPENASIP_TARGET PROPERTY STRINGS
-    tta x86_64 almaif all)
-
-set(OPENASIP_VALID_TARGETS
-    tta
-    x86_64
-    almaif
-    all
-)
+set(OPENASIP_TARGET "" CACHE STRING "OpenASIP target to configure: tta, x86_64, almaif, all")
+set_property(CACHE OPENASIP_TARGET PROPERTY STRINGS tta x86_64 almaif all)
+set(OPENASIP_VALID_TARGETS tta x86_64 almaif all)
 
 if(NOT OPENASIP_TARGET IN_LIST OPENASIP_VALID_TARGETS)
     message(FATAL_ERROR
@@ -44,15 +34,15 @@ if(NOT OPENASIP_TARGET IN_LIST OPENASIP_VALID_TARGETS)
 endif()
 
 # Everything that uses .adf files.
-set(OPENASIP_ADF_TARGETS
-    tta
-    almaif
-)
+set(OPENASIP_ADF_TARGETS tta almaif)
 
 if(OPENASIP_TARGET IN_LIST OPENASIP_ADF_TARGETS
    OR OPENASIP_TARGET STREQUAL "all")
     add_subdirectory(arch/rtl)
 endif()
+
+# Per-target kernels.
+add_subdirectory(targets)
 
 # Simulation infrastructure.
 if(OPENASIP_TARGET STREQUAL "tta"
@@ -61,6 +51,3 @@ if(OPENASIP_TARGET STREQUAL "tta"
    OR OPENASIP_TARGET STREQUAL "all")
     add_subdirectory(sim)
 endif()
-
-# Per-target kernels.
-add_subdirectory(targets)

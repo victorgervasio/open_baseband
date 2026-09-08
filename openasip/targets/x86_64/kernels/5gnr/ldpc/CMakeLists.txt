@@ -1,70 +1,93 @@
-set(KERNEL_TARGET "x86_64-ldpc")
+set(KERNEL_BUILD_TARGET "build-x86_64-kernels-5gnr-ldpc")
+set(KERNEL_SIM_TARGET "simulate-x86_64-kernels-5gnr-ldpc")
+set(KERNEL_NAME "5gnr_ldpc")
+set(x86_64_PROGRAM "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}")
 
-set(x86_64_PROGRAM "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_TARGET}")
-
-file(GLOB_RECURSE LDPC_SOURCES CONFIGURE_DEPENDS
+# ---------------------------------------------------------------------------
+# Source files
+# ---------------------------------------------------------------------------
+file(
+    GLOB_RECURSE LDPC_SOURCES
+    CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
+file(
+    GLOB_RECURSE LDPC_COMMON_SOURCES
+    CONFIGURE_DEPENDS
+    "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src/*.cpp"
+)
 
-# Do not compile the standalone table/random generators as part of the kernel
-# executable. They are development utilities with their own mains.
-list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-n0/")
-list(FILTER LDPC_SOURCES EXCLUDE REGEX "/gen-random/")
+# Generator programs are built separately by targets/common and must not be
+# compiled as part of the TTA kernel.
 list(FILTER LDPC_SOURCES EXCLUDE REGEX "/temp/")
+list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-n0/")
+list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-random/")
 
-# nrLDPCTables.cpp contains the definitions of the 5G NR LDPC 
-# lifting-size and shift tables used by LDPC.cpp. 
-set(LDPC_COMMON_SOURCES "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src/nrLDPCTables.cpp")
-add_executable(${KERNEL_TARGET} ${LDPC_SOURCES} ${LDPC_COMMON_SOURCES} )
+add_executable(
+    ${KERNEL_BUILD_TARGET}
+    ${LDPC_SOURCES}
+    ${LDPC_COMMON_SOURCES}
+)
 
-target_include_directories(${KERNEL_TARGET}
+set_target_properties(
+    ${KERNEL_BUILD_TARGET}
+    PROPERTIES
+        OUTPUT_NAME "${KERNEL_NAME}"
+)
+
+# ---------------------------------------------------------------------------
+# Include paths
+# ---------------------------------------------------------------------------
+target_include_directories(
+    ${KERNEL_BUILD_TARGET}
     PRIVATE
-        "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/include"
-        "${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/src"
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${ETL_ROOT}/include"
         "${ETL_ROOT}/etl/include"
         "${ETL_INSTALL_DIR}/include"
 )
 
-target_compile_options(${KERNEL_TARGET}
+# ldpc-common supplies:
+#
+#   targets/common/.../include
+#   build-<target>/targets/common/.../include
+#
+# and the dependency on generation of n0_table.h and normal_samples.h.
+target_link_libraries(
+    ${KERNEL_BUILD_TARGET}
     PRIVATE
-        $<$<CONFIG:Debug>:-g3> # -g3 for more info on debugging, such as macro debugging info
+        ldpc-common
+)
+
+# ---------------------------------------------------------------------------
+# Compiler options
+# ---------------------------------------------------------------------------
+target_compile_options(
+    ${KERNEL_BUILD_TARGET}
+    PRIVATE
+        $<$<CONFIG:Debug>:-g3>
         $<$<CONFIG:RelWithDebInfo>:-g3>
         $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>
-
         $<$<CONFIG:Debug>:-fsanitize=address,undefined>
         $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
 )
 
-target_link_options(${KERNEL_TARGET}
+target_link_options(
+    ${KERNEL_BUILD_TARGET}
     PRIVATE
         $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 
-# sim.py creates the timestamped experiment log and captures the simulator
-# output. The simulator is selected explicitly so `make ttasim` and
-# `make proxim` cannot accidentally run the other simulator.
-add_custom_target(simulate-x86_64-ldpc
+# ---------------------------------------------------------------------------
+# x86-64 simulation
+# ---------------------------------------------------------------------------
+add_custom_target(${KERNEL_SIM_TARGET}
     COMMAND "${Python3_EXECUTABLE}"
             "${OPENBASEBAND_SIM_PY}"
             --target x86_64
             --sim_root "${SIM_OUTPUT_DIR}"
-            --x86_64_program "${x86_64_PROGRAM}"
-    DEPENDS ${KERNEL_TARGET}
+            --x86_64_program "$<TARGET_FILE:${KERNEL_BUILD_TARGET}>"
+    #DEPENDS ${KERNEL_BUILD_TARGET}
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     USES_TERMINAL
 )
-add_dependencies(simulate-x86_64 simulate-x86_64-ldpc)
-
-add_custom_target(test-x86_64-ldpc
-    COMMAND "${Python3_EXECUTABLE}"
-            "${OPENBASEBAND_SIM_PY}"
-            --target x86_64
-            --sim_root "${SIM_OUTPUT_DIR}"
-            --x86_64_program "${x86_64_PROGRAM}"
-    DEPENDS ${KERNEL_TARGET}
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    USES_TERMINAL
-)
-add_dependencies(test-x86_64 test-x86_64-ldpc)
