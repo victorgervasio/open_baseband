@@ -245,4 +245,4 @@ build
             └── pyvenv.cfg
 
 48 directories, 61 files
-```bash
+```
