@@ -213,13 +213,13 @@ etl::vector<bool, MAX_INFO_NODE_BITS> nrLDPC::decode(const etl::vector<float, MA
 			}
 			//check node operation
             _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer);
+            printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer);
             _TCE_RTC(1, check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             etl::vector<etl::vector<float,MAX_ZC>,MAX_CHECK_NODE_DEGREE> minSumMsgs = checkNodeOperation(VtoCMsg);
             _TCE_RTC(1,check_node_operation_end);
             _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer);
-            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.4f\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
+            printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer);
+            printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.6f\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
             //printf("\noi20 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 
 			//message from check node to varible nodes
@@ -267,9 +267,13 @@ etl::vector<etl::vector<float, MAX_ZC>,MAX_CHECK_NODE_DEGREE> nrLDPC::checkNodeO
 	//-------------------------------------------------------------------------------------------------
 
 	unsigned nNodes = msgIn.size();
+    assert(nNodes <= MAX_CHECK_NODE_DEGREE);
     //printf("\nCN: oi1\n");
-
+ 
     etl::vector<etl::vector<float, MAX_CHECK_NODE_DEGREE>, MAX_ZC> msgMat = transposeMat(msgIn);
+    for (unsigned i = 0; i < mZc; ++i)
+        msgMat[i].resize(MAX_CHECK_NODE_DEGREE,etl::numeric_limits<float>::infinity()); // avoid out-of-bounds read access error
+                                                                                        // infinity is _OA_CHECK_NODE "null element" (dummy value)
     //printf("\nCN: oi2\n");
     etl::vector<size_t,MAX_CHECK_NODE_DEGREE> sortedIdx(nNodes, 0);
     //printf("\nCN: oi3\n");
@@ -280,74 +284,119 @@ etl::vector<etl::vector<float, MAX_ZC>,MAX_CHECK_NODE_DEGREE> nrLDPC::checkNodeO
 	size_t min1Idx, min2Idx;
     //printf("\nCN: oi6\n");
 
-    etl::vector<etl::vector<float, MAX_CHECK_NODE_DEGREE>,MAX_ZC> msgOut(mZc);
+    etl::vector<etl::vector<float, MAX_CHECK_NODE_DEGREE>, MAX_ZC> msgOut(mZc);
+
+    for (unsigned i = 0; i < mZc; ++i)
+        msgOut[i] = etl::vector<float, MAX_CHECK_NODE_DEGREE>(MAX_CHECK_NODE_DEGREE, 0.0f); // avoid out-of-bounds write access error
+ 
     //printf("\nCN: oi7\n");
 	for (unsigned i = 0; i < mZc; i++) {
+        _OA_CHECK_NODE(
+            msgMat[i][0],
+            msgMat[i][1],
+            msgMat[i][2],
+            msgMat[i][3],
+            msgMat[i][4],
+            msgMat[i][5],
+            msgMat[i][6],
+            msgMat[i][7],
+            msgMat[i][8],
+            msgMat[i][9],
+            msgMat[i][10],
+            msgMat[i][11],
+            msgMat[i][12],
+            msgMat[i][13],
+            msgMat[i][14],
+            msgMat[i][15],
+            msgMat[i][16],
+            msgMat[i][17],
+            msgMat[i][18],
+
+            msgOut[i][0],
+            msgOut[i][1],
+            msgOut[i][2],
+            msgOut[i][3],
+            msgOut[i][4],
+            msgOut[i][5],
+            msgOut[i][6],
+            msgOut[i][7],
+            msgOut[i][8],
+            msgOut[i][9],
+            msgOut[i][10],
+            msgOut[i][11],
+            msgOut[i][12],
+            msgOut[i][13],
+            msgOut[i][14],
+            msgOut[i][15],
+            msgOut[i][16],
+            msgOut[i][17],
+            msgOut[i][18]
+        );
         //printf("\nCN: oi8 [%i/%i]\n",i,mZc-1);
 		// sort abs(llr)
-		sortedIdx = sort_indexes(msgMat[i]);
-        //printf("\nCN: oi9 [%i/%i]\n",i,mZc-1);
-		min1Idx = sortedIdx[0];
-        //printf("\nCN: oi10 [%i/%i]\n",i,mZc-1);
-		min2Idx = sortedIdx[1];
-        //printf("\nCN: oi11 [%i/%i]\n",i,mZc-1);
+		//sortedIdx = sort_indexes(msgMat[i]);
+        ////printf("\nCN: oi9 [%i/%i]\n",i,mZc-1);
+		//min1Idx = sortedIdx[0];
+        ////printf("\nCN: oi10 [%i/%i]\n",i,mZc-1);
+		//min2Idx = sortedIdx[1];
+        ////printf("\nCN: oi11 [%i/%i]\n",i,mZc-1);
 
-		//minimum and second minimum
-		min1 = fabs(msgMat[i][min1Idx]);
-        //printf("\nCN: oi12 [%i/%i]\n",i,mZc-1);
-		min2 = fabs(msgMat[i][min2Idx]);
-        //printf("\nCN: oi13 [%i/%i]\n",i,mZc-1);
+		////minimum and second minimum
+		//min1 = fabs(msgMat[i][min1Idx]);
+        ////printf("\nCN: oi12 [%i/%i]\n",i,mZc-1);
+		//min2 = fabs(msgMat[i][min2Idx]);
+        ////printf("\nCN: oi13 [%i/%i]\n",i,mZc-1);
 
-		// offset
-		min1 = (min1 > 0.5) ? min1 - 0.5 : 0.0;
-        //printf("\nCN: oi14 [%i/%i]\n",i,mZc-1);
-		min2 = (min2 > 0.5) ? min2 - 0.5 : 0.0;
-        //printf("\nCN: oi15 [%i/%i]\n",i,mZc-1);
+		//// offset
+		//min1 = (min1 > 0.5) ? min1 - 0.5 : 0.0;
+        ////printf("\nCN: oi14 [%i/%i]\n",i,mZc-1);
+		//min2 = (min2 > 0.5) ? min2 - 0.5 : 0.0;
+        ////printf("\nCN: oi15 [%i/%i]\n",i,mZc-1);
 
-		// absoulte value of msgOut
-		//msgOut[i] = etl::vector<float,MAX_CHECK_NODE_DEGREE>(msgMat[i].size(), min1);
-        msgOut[i].clear();
-        //printf("\nCN: oi16 [%i/%i]\n",i,mZc-1);
-        for (unsigned j = 0; j < nNodes; ++j) {
-            //printf("\nCN: oi17 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
-            msgOut[i].push_back(min1);
-        }
-		msgOut[i][min1Idx] = min2;
-        //printf("\nCN: oi18 [%i/%i]\n",i,mZc-1);
+		//// absoulte value of msgOut
+		////msgOut[i] = etl::vector<float,MAX_CHECK_NODE_DEGREE>(msgMat[i].size(), min1);
+        //msgOut[i].clear();
+        ////printf("\nCN: oi16 [%i/%i]\n",i,mZc-1);
+        //for (unsigned j = 0; j < nNodes; ++j) {
+        //    //printf("\nCN: oi17 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
+        //    msgOut[i].push_back(min1);
+        //}
+		//msgOut[i][min1Idx] = min2;
+        ////printf("\nCN: oi18 [%i/%i]\n",i,mZc-1);
 
-		// assign to output
-		parity = 1.0;
-        //printf("\nCN: oi19 [%i/%i]\n",i,mZc-1);
-		for (unsigned j = 0; j < nNodes; j++) {
-            //printf("\nCN: oi20 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
-			//sign[j] = 2.0 * (msgMat[i][j] >= 0) - 1.0;
-            if (msgMat[i][j] >= 0.0) {
-                //printf("\nCN: oi21 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
-                sign[j] = 1.0;
-            } else {
-                //printf("\nCN: oi22 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
-                sign[j] = -1.0;
-            }
-			parity = parity * sign[j];
-            //printf("\nCN: oi23 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
-		}
-        /*DEBUG -> REMOVE
-        printf(
-            "i=%u nNodes=%u msgOut.size=%u msgOut[i].size=%u "
-            "msgOut[i].capacity=%u sign.size=%u min1Idx=%u\n",
-            i,
-            nNodes,
-            (unsigned)msgOut.size(),
-            (unsigned)msgOut[i].size(),
-            (unsigned)msgOut[i].capacity(),
-            (unsigned)sign.size(),
-            (unsigned)min1Idx
-        );
-        DEBUG -> REMOVE*/
-		for (unsigned j = 0; j < nNodes; j++) {
-            //printf("\nCN: oi24 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
-			msgOut[i][j] = msgOut[i][j] * parity * sign[j];
-		}
+		//// assign to output
+		//parity = 1.0;
+        ////printf("\nCN: oi19 [%i/%i]\n",i,mZc-1);
+		//for (unsigned j = 0; j < nNodes; j++) {
+        //    //printf("\nCN: oi20 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
+		//	//sign[j] = 2.0 * (msgMat[i][j] >= 0) - 1.0;
+        //    if (msgMat[i][j] >= 0.0) {
+        //        //printf("\nCN: oi21 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
+        //        sign[j] = 1.0;
+        //    } else {
+        //        //printf("\nCN: oi22 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
+        //        sign[j] = -1.0;
+        //    }
+		//	parity = parity * sign[j];
+        //    //printf("\nCN: oi23 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
+		//}
+        ///*DEBUG -> REMOVE
+        //printf(
+        //    "i=%u nNodes=%u msgOut.size=%u msgOut[i].size=%u "
+        //    "msgOut[i].capacity=%u sign.size=%u min1Idx=%u\n",
+        //    i,
+        //    nNodes,
+        //    (unsigned)msgOut.size(),
+        //    (unsigned)msgOut[i].size(),
+        //    (unsigned)msgOut[i].capacity(),
+        //    (unsigned)sign.size(),
+        //    (unsigned)min1Idx
+        //);
+        //DEBUG -> REMOVE*/
+		//for (unsigned j = 0; j < nNodes; j++) {
+        //    //printf("\nCN: oi24 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
+		//	msgOut[i][j] = msgOut[i][j] * parity * sign[j];
+		//}
 	}
 
     //printf("\nCN: oi25");
