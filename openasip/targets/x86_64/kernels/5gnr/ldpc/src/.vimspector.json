@@ -1,0 +1,29 @@
+{
+  "configurations": {
+    "Debug x86_64-ldpc (open_baseband) with vscode-cpptools": {
+      "adapter": "vscode-cpptools",
+      "breakpoints": {
+        "exception": {
+          "all": "N",
+          "uncaught": "Y"
+        }
+      },
+      "configuration": {
+        "request": "launch",
+        "cwd": "${workspaceRoot}",
+        "program": "${workspaceRoot}/../../../../../../../build/openasip/build-x86_64/openasip/targets/x86_64/kernels/5gnr/ldpc/5gnr_ldpc",
+        "type": "cppdbg",
+        "MIMode": "gdb",
+        "console": "integratedTerminal",
+        "stopOnEntry": true,
+        "setupCommands": [
+          {
+            "description": "Enable pretty printing",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      }
+    }
+  }
+}
