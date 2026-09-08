@@ -141,106 +141,65 @@ etl::vector<bool, MAX_INFO_NODE_BITS> nrLDPC::decode(const etl::vector<float, MA
     volatile unsigned int check_node_operation_start = 0;
     volatile unsigned int check_node_operation_end = 0;
 
-    //printf("\noi1\n");
 	assert(softBitsIn.size() == mN);
-    //printf("\noi2\n");
 
 	// initialize LLR in blocks(nodes), each node with Zc bits
     etl::vector<etl::vector<float, MAX_ZC>, MAX_CB> LLR(mN / mZc);
-    //printf("\noi3\n");
 	for (unsigned i = 0; i < mN / mZc; i++) {
-        //printf("\noi4 [%i/%i]\n",i,static_cast<int>(mN/mZc));
 		LLR[i] = etl::vector<float, MAX_ZC>(softBitsIn.begin() + i * mZc, softBitsIn.begin() + (i + 1) * mZc);
 	}
 
 	// find how many parity nodes to use for decoding
 	unsigned nMaxLayer;
-    //printf("\noi5\n");
 	if (mBGn == 1) {
 		// assume tx bits length =  ceil(kBar/R), alternatively can use all layers(slower)
-		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 20;
         nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 20;
-        //printf("\noi6\n");
-        //DEBUG
-        //nMaxLayer = mLayers.size();
-        //DEBUG
     } else {
-		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 8;
         nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 8;
-        //printf("\noi7\n");
-        //DEBUG
-        //nMaxLayer = mLayers.size();
-        //DEBUG
 	}
 
 	// initialize msg from check nodes to vector nodes, each edge correspond a message
     etl::vector<etl::vector<float, MAX_ZC>, MAX_EDGES> CtoVMsg(mEdges.size());
-    //printf("\noi8\n");
     int my_iter = 0;
 	for (auto& e : CtoVMsg) {
-        //printf("\noi9 [%i/%i]\n",my_iter,static_cast<unsigned int>(CtoVMsg.size())-1);
         my_iter++;
 		e = etl::vector<float,MAX_ZC>(mZc, 0);
 	}
 	// llr updates
 	unsigned nLayerEdges, edgeIdx, nShifts, vNodeIdx;
-    //printf("\noi10\n");
 	for (unsigned iIter = 0; iIter < nMaxIter; iIter++) {
 		for (unsigned iLayer = 0; iLayer < nMaxLayer; iLayer++) {
-            //printf("\noi11 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 			nLayerEdges = mLayers[iLayer].edgeEnd - mLayers[iLayer].edgeStart;
-            //printf("\noi12 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 			// messages from variable nodes to check node
             etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE> VtoCMsg(nLayerEdges);
-            //printf("\noi13 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
             my_iter = 0;
 			for (auto& e : VtoCMsg) {
-                //printf("\noi14 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,my_iter,static_cast<unsigned int>(VtoCMsg.size())-1);
                 my_iter++;
 				e = etl::vector<float,MAX_ZC>(mZc, 0);
 			}
 			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
-                //printf("\noi15 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
-                //printf("\noi16 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
-                //printf("\noi17 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				LLR[vNodeIdx] = eleWiseMinus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
-                //printf("\noi18 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				VtoCMsg[iEdge] = LLR[vNodeIdx];
-                //printf("\noi19 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				VtoCMsg[iEdge] = circShift(VtoCMsg[iEdge], nShifts);
 			}
 			//check node operation
-            _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-            //printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer);
-            _TCE_RTC(1, check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             etl::vector<etl::vector<float,MAX_ZC>,MAX_CHECK_NODE_DEGREE> minSumMsgs = checkNodeOperation(VtoCMsg);
-            _TCE_RTC(1,check_node_operation_end);
-            _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-            //printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer);
-            //printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.4f\n",sim_time/1e6,snr_g,blk_g,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
-            //printf("\noi20 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 
 			//message from check node to varible nodes
 			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
-                //printf("\noi21 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
-                //printf("\noi22 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
-                //printf("\noi23 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				CtoVMsg[edgeIdx] = circShift(minSumMsgs[iEdge], mZc - nShifts);
-                //printf("\noi24 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				LLR[vNodeIdx] = eleWisePlus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
 			}
 		}
 	}
 	// flatten the 2-D vector LLR
     etl::vector<float, MAX_CODEWORD_LENGTH> vecLLR;
-    //printf("\noi25\n");
     my_iter = 0;
 	for (auto e : LLR) {
-        //printf("\noi25 [%i/%i]\n",my_iter,static_cast<unsigned int>(LLR.size())-1);
         my_iter++;
 		vecLLR.insert(vecLLR.end(), e.begin(), e.end());
 	}
@@ -248,10 +207,8 @@ etl::vector<bool, MAX_INFO_NODE_BITS> nrLDPC::decode(const etl::vector<float, MA
 
 	// chose information bits
     etl::vector<bool, MAX_INFO_NODE_BITS> decBits(mKBar, false);
-    //printf("\noi26\n");
     my_iter = 0;
 	for (unsigned i = 0; i < mKBar; i++) {
-        //printf("\noi27 [%i/%i]\n",my_iter,static_cast<unsigned int>(mKBar)-1);
         my_iter++;
 		decBits[i] = (vecLLR[i] <= 0);
 	}
@@ -267,90 +224,52 @@ etl::vector<etl::vector<float, MAX_ZC>,MAX_CHECK_NODE_DEGREE> nrLDPC::checkNodeO
 	//-------------------------------------------------------------------------------------------------
 
 	unsigned nNodes = msgIn.size();
-    //printf("\nCN: oi1\n");
 
     etl::vector<etl::vector<float, MAX_CHECK_NODE_DEGREE>, MAX_ZC> msgMat = transposeMat(msgIn);
-    //printf("\nCN: oi2\n");
     etl::vector<size_t,MAX_CHECK_NODE_DEGREE> sortedIdx(nNodes, 0);
-    //printf("\nCN: oi3\n");
 	etl::vector<float,MAX_CHECK_NODE_DEGREE> sign(nNodes, 1.0);
-    //printf("\nCN: oi4\n");
 	float min1, min2, parity;
-    //printf("\nCN: oi5\n");
 	size_t min1Idx, min2Idx;
-    //printf("\nCN: oi6\n");
 
     etl::vector<etl::vector<float, MAX_CHECK_NODE_DEGREE>,MAX_ZC> msgOut(mZc);
-    //printf("\nCN: oi7\n");
 	for (unsigned i = 0; i < mZc; i++) {
-        //printf("\nCN: oi8 [%i/%i]\n",i,mZc-1);
 		// sort abs(llr)
 		sortedIdx = sort_indexes(msgMat[i]);
-        //printf("\nCN: oi9 [%i/%i]\n",i,mZc-1);
 		min1Idx = sortedIdx[0];
-        //printf("\nCN: oi10 [%i/%i]\n",i,mZc-1);
 		min2Idx = sortedIdx[1];
-        //printf("\nCN: oi11 [%i/%i]\n",i,mZc-1);
 
 		//minimum and second minimum
 		min1 = fabs(msgMat[i][min1Idx]);
-        //printf("\nCN: oi12 [%i/%i]\n",i,mZc-1);
 		min2 = fabs(msgMat[i][min2Idx]);
-        //printf("\nCN: oi13 [%i/%i]\n",i,mZc-1);
 
 		// offset
 		min1 = (min1 > 0.5) ? min1 - 0.5 : 0.0;
-        //printf("\nCN: oi14 [%i/%i]\n",i,mZc-1);
 		min2 = (min2 > 0.5) ? min2 - 0.5 : 0.0;
-        //printf("\nCN: oi15 [%i/%i]\n",i,mZc-1);
 
 		// absoulte value of msgOut
 		//msgOut[i] = etl::vector<float,MAX_CHECK_NODE_DEGREE>(msgMat[i].size(), min1);
         msgOut[i].clear();
-        //printf("\nCN: oi16 [%i/%i]\n",i,mZc-1);
         for (unsigned j = 0; j < nNodes; ++j) {
-            //printf("\nCN: oi17 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
             msgOut[i].push_back(min1);
         }
 		msgOut[i][min1Idx] = min2;
-        //printf("\nCN: oi18 [%i/%i]\n",i,mZc-1);
 
 		// assign to output
 		parity = 1.0;
-        //printf("\nCN: oi19 [%i/%i]\n",i,mZc-1);
 		for (unsigned j = 0; j < nNodes; j++) {
-            //printf("\nCN: oi20 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
 			//sign[j] = 2.0 * (msgMat[i][j] >= 0) - 1.0;
             if (msgMat[i][j] >= 0.0) {
-                //printf("\nCN: oi21 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
                 sign[j] = 1.0;
             } else {
-                //printf("\nCN: oi22 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
                 sign[j] = -1.0;
             }
 			parity = parity * sign[j];
-            //printf("\nCN: oi23 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
 		}
-        /*DEBUG -> REMOVE
-        printf(
-            "i=%u nNodes=%u msgOut.size=%u msgOut[i].size=%u "
-            "msgOut[i].capacity=%u sign.size=%u min1Idx=%u\n",
-            i,
-            nNodes,
-            (unsigned)msgOut.size(),
-            (unsigned)msgOut[i].size(),
-            (unsigned)msgOut[i].capacity(),
-            (unsigned)sign.size(),
-            (unsigned)min1Idx
-        );
-        DEBUG -> REMOVE*/
 		for (unsigned j = 0; j < nNodes; j++) {
-            //printf("\nCN: oi24 [%i/%i] [%i/%i]\n",i,mZc-1,j,nNodes-1);
 			msgOut[i][j] = msgOut[i][j] * parity * sign[j];
 		}
 	}
 
-    //printf("\nCN: oi25");
 	return transposeMat(msgOut);
 }
 etl::vector<bool,CODE_WORD_BITS_LENGTH> nrLDPC::rateMatch(const etl::vector<bool,MAX_CODEWORD_LENGTH>& bitsIn, size_t nOfBitOut)
@@ -450,8 +369,6 @@ uint8_t nrLDPC::selectShiftSet(uint16_t Zc)
 				return i;
 		}
 	}
-	//cerr << " Zc is not valid!";
-	//fprintf(stderr,"Zc is not valid!");
 	return -1;
 }
 etl::vector<etl::vector<bool,MAX_PCM_COLS>,MAX_PCM_ROWS> nrLDPC::makeParityCheckMatrix(uint8_t BGn, const uint16_t Zc)
