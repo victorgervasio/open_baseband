@@ -7,7 +7,7 @@ Current architecture:
 <img src="doc/img/arch/5gnr_ue_baseband_proc_sim_3.png" width="100%">
 
 Processor simulation (Proxim) window (paused during LDPC code/decode simulation):
-<img src="doc/img/sim/proxim_5gnr_ue_baseband_proc_sim.png" width="100%">
+<img src="doc/sim/proxim_5gnr_ue_baseband_proc_sim.png" width="100%">
 
 Machine View and Processor utilization stats (paused LDPC code/decode simulation):
 <img src="doc/sim/machine_window_5gnr_ue_baseband_proc_sim.png" width="100%">
