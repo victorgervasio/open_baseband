@@ -1,6 +1,14 @@
 An open-source "end-to-end" 5GNR baseband processor project, implementing
 L1 (Physical Layer) kernels.
 
+## Table of Contents
+* [1. Introduction](#1-introduction)
+* [2. Setup](#2-setup)
+    * [2.1. Prerequisites](#21-prerequisites)
+    * [2.2. Build](#22-build)
+
+# 1. Introduction
+
 Current architecture:
 <img src="doc/img/arch/5gnr_ue_baseband_proc_sim_1.png" width="100%">
 <img src="doc/img/arch/5gnr_ue_baseband_proc_sim_2.png" width="100%">
@@ -390,9 +398,9 @@ Some performance analysis:
 ![Failed to load](doc/img/targets/common/kernels/5gnr/ldpc/checkNodeOperation.png)
 -->
 
-# 2 USER GUIDE - PREREQUISITES AND BUILD
+# 2. Setup
 
-## 2.1 PREREQUISITES
+## 2.1. Prerequisites
 
 You will need:
 * GNU Make
@@ -404,7 +412,8 @@ You will need:
 Build and install OpenASIP, as described in the project's root README.md. Then, proceed
 to build this project.
 
-## 2.2 BUILD
+## 2.2 Build
+
 ```bash
 cd open_baseband/
 make build-tta
