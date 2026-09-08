@@ -1,11 +1,15 @@
 #include <etl/numeric.h> /*uint8_t, uint16_t*/
 
+#ifndef DEFINES_H
+#define DEFINES_H
+
 #ifndef LIN_SPACE_NUM
 #define LIN_SPACE_NUM 9
 #endif
 
 #ifndef MESSAGE_LENGTH
-#define MESSAGE_LENGTH 15 // including null terminator (\0)
+//#define MESSAGE_LENGTH 15 // including null terminator (\0)
+#define MESSAGE_LENGTH 303 // including null terminator (\0)
 #endif
 
 #ifndef MESSAGE_BITS_LENGTH
@@ -17,7 +21,7 @@ constexpr int MESSAGE_BITS_LENGTH = MESSAGE_LENGTH * 8; //120
 //#endif
 #ifndef CODE_WORD_BITS_LENGTH
 //#define CODE_WORD_BITS_LENGTH 9000 // change until bler starts falling
-#define CODE_WORD_BITS_LENGTH 7000 // change until bler starts falling
+#define CODE_WORD_BITS_LENGTH 8000 // change until bler starts falling
 #endif
 
 #ifndef CODE_RATE_NUM
@@ -46,7 +50,7 @@ constexpr int INFO_LENGTH = INFO_BITS_LENGTH / 8; //41
 
 #ifndef N_MAX_BLKS
 //#define N_MAX_BLKS 10000
-#define N_MAX_BLKS 3
+#define N_MAX_BLKS 10
 #endif
 
 #ifndef EXT_MSG_LENGTH
@@ -71,3 +75,5 @@ inline unsigned int snr_g = 0;
 inline unsigned int blk_g = 0;
 
 #endif
+
+#endif //DEFINES_H

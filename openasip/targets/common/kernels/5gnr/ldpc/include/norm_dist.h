@@ -1,6 +1,7 @@
+#pragma once
+
 #include "normal_samples.h"
-//#include <cmath>
-#include <etl/numeric.h>
+#include "ldpc_numeric.h"
 
 class NormDistRandomEngine {
 private:

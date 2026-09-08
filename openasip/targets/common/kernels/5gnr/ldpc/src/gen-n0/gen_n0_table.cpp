@@ -4,14 +4,17 @@
 #include <fstream>
 #include <iomanip>
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc != 2)
+        return 1;
+
     // Put the actual Es/N0 values used by your LDPC program here.
     constexpr float ESN0_START = -4.0f;
     constexpr float ESN0_STEP  = 0.25f;
     constexpr unsigned ESN0_SIZE = LIN_SPACE_NUM;
 
-    std::ofstream out("n0_table.h");
+    std::ofstream out(argv[1]);
 
     out << "#ifndef N0_TABLE_H\n";
     out << "#define N0_TABLE_H\n\n";

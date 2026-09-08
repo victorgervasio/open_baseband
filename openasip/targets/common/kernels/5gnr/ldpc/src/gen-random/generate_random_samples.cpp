@@ -1,12 +1,15 @@
 #include <random>
 #include <fstream>
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc != 2)
+        return 1;
+
     std::default_random_engine engine(12345);
     std::normal_distribution<float> dist(0.0, 1.0);
 
-    std::ofstream out("normal_samples.h");
+    std::ofstream out(argv[1]);
 
     out << "#ifndef NORMAL_SAMPLES_H\n";
     out << "#define NORMAL_SAMPLES_H\n\n";

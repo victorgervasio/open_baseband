@@ -48,11 +48,10 @@ CMAKE_BUILD_TYPE ?= Release # RelWithDebInfo for getting debug symbols
 .PHONY: build-tta-sim build-tta-asic
 .PHONY: tta x86_64 almaif
 .PHONY: simulate simulate-tta simulate-x86_64 simulate-almaif
-.PHONY: ttasim proxim
 .PHONY: verilog-rtl vhdl-rtl 
 .PHONY: dataset-tta dataset-x86_64 dataset-almaif dataset
 .PHONY: analyze-tta analyze-x86_64 analyze-almaif analyze
-.PHONY: clean distclean test test-tta test-x86_64 test-almaif
+.PHONY: clean distclean
 .PHONY: format lint help
 
 # Every public recipe enters the OpenASIP environment first.  This does not
@@ -67,13 +66,15 @@ fi
 source "$(TCE_ENV)"
 endef
 
-all: build
+all: OPENASIP_TARGET=all
+all: configure 
+	$(SOURCE_TCE)
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target all
 
-build: BUILD_DIR=$(BUILD_ROOT)/all
 build: OPENASIP_TARGET=all
 build: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-all
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build
 
 configure: ensure-etl ensure-sim-venv
 	$(SOURCE_TCE)
@@ -149,27 +150,27 @@ ensure-sim-venv:
 build-tta: OPENASIP_TARGET=tta
 build-tta: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target tta-build
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-tta
 
 build-tta-sim: OPENASIP_TARGET=tta
 build-tta-sim: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target sim-tta-build
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-tta-sim
 
 build-tta-asic: OPENASIP_TARGET=tta
 build-tta-asic: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target asic-tta-build
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-tta-asic
 
 build-x86_64: OPENASIP_TARGET=x86_64
 build-x86_64: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target x86_64-build
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-x86_64
 
 build-almaif: OPENASIP_TARGET=almaif
 build-almaif: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target almaif-build
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-almaif
 
 tta: OPENASIP_TARGET=tta
 tta: configure
@@ -206,16 +207,6 @@ simulate-almaif: configure
 	$(SOURCE_TCE)
 	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target simulate-almaif
 
-ttasim: OPENASIP_TARGET=tta
-ttasim: configure
-	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target ttasim
-
-proxim: OPENASIP_TARGET=tta
-proxim: configure
-	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target proxim
-
 verilog-rtl: OPENASIP_TARGET=tta
 verilog-rtl: RTL_HDL=verilog
 verilog-rtl: configure
@@ -247,30 +238,11 @@ build: BUILD_DIR=$(BUILD_ROOT)/all
 build: OPENASIP_TARGET=all
 dataset: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-all
+	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset
 
 analyze: configure
 	$(SOURCE_TCE)
 	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target analyze
-
-test: configure
-	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target test
-
-test-tta: OPENASIP_TARGET=tta
-test-tta: configure
-	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target test-tta
-
-test-x86_64: OPENASIP_TARGET=x86_64
-test-x86_64: configure
-	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target test-x86_64
-
-test-almaif: OPENASIP_TARGET=almaif
-test-almaif: configure
-	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target test-almaif
 
 format: configure
 	$(SOURCE_TCE)
@@ -308,13 +280,10 @@ help:
 	@echo "  make x86_64              Build x86_64 and run it"
 	@echo "  make almaif              Build ALMAIF and run it"
 	@echo "  make simulate[-<target>] Run an already configured simulation target"
-	@echo "  make ttasim              Run TTA with ttasim"
-	@echo "  make proxim              Run TTA with Proxim"
 	@echo "  make verilog-rtl         Generate processor RTL in Verilog"
 	@echo "  make vhdl-rtl            Generate processor RTL in VHDL"
 	@echo "  make dataset             Generate timing CSVs"
 	@echo "  make analyze             Run analysis"
-	@echo "  make test[-<target>]     Run correctness tests"
 	@echo "  make clean               Clean CMake build artifacts"
 	@echo "  make distclean           Remove the CMake build tree"
 	@echo ""
