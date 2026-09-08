@@ -4,42 +4,42 @@ using namespace  std;
 
 nrLDPC::nrLDPC(size_t infoLen, float codeRate)
 {
-	mKBar = infoLen;
-	mR = codeRate;
+	mKBar = infoLen; // 3000 = INFO_BITS_LENGTH(3000,defines.h) -> assume previous Code Block Segmentation (TS 38.212-j40, cap. 5.2.2)
+	mR = codeRate; // (float)(1/3) = CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
 
 	// select base graph based on 3GPP 38.212 7.2.2
-	mBGn = selectBaseGraph(mKBar, mR);
+	mBGn = selectBaseGraph(mKBar, mR); // 2 = f(INFO_BITS_LENGTH(3000,defines.h),CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
 
 	// select lifting size
-	mZc = selectLiftSize(mKBar, mBGn);
+	mZc = selectLiftSize(mKBar, mBGn); // 320 = f(INFO_BITS_LENGTH(3000,defines.h),CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
 
 	// select shifting set
-	mSetIdx = selectShiftSet(mZc);
+	mSetIdx = selectShiftSet(mZc); // 2 = f(INFO_BITS_LENGTH(3000,defines.h),CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
 
 	// systematic bits length and parity bits length
 	if (mBGn == 1) {
 		mK = 22 * mZc; mN = 68 * mZc;
 	}
 	else {
-		mK = 10 * mZc;  mN = 52 * mZc;
-	}
+		mK = 10 * mZc;  mN = 52 * mZc; // mK = 3200 = f(INFO_BITS_LENGTH(3000,defines.h),CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
+	}                                  // mN = 16640 = f(INFO_BITS_LENGTH(3000,defines.h),CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
 
 	// fillers length
-	mF = mK - mKBar;
+	mF = mK - mKBar; // mF = 200 = f(INFO_BITS_LENGTH(3000,defines.h),CODE_RATE(static_cast<float>(CODE_RATE_NUM(1,defines.h)) / static_cast<float>(CODE_RATE_DEN(3,defines.h)),defines.h)
 
 	// build up edges and shifts
 	if (mBGn == 1) {
-		mEdges.reserve(316);
+		mEdges.reserve(316); // number of rows of 3GPP TS 38.212 - Table 5.3.2-2: LDPC base graph 1 and its parity check matrices, see nrLDPCTables.cpp
 		for (unsigned i = 0; i < 316; i++) {
 			mEdges.push_back(edge_t());
-			mEdges[i] = { shiftTableBgn_1[i][0],shiftTableBgn_1[i][1],uint16_t(shiftTableBgn_1[i][mSetIdx + 2] % mZc) };
+			mEdges[i] = { shiftTableBgn_1[i][0],shiftTableBgn_1[i][1],uint16_t(shiftTableBgn_1[i][mSetIdx + 2] % mZc) }; // mEdges[i] = { cNodeIdx , vNodeIdx, nShifts }, see LDPC.h
 		}
 	}
 	else {
-		mEdges.reserve(197);
+		mEdges.reserve(197); // number of rows of 3GPP TS 38.212 - Table 5.3.2-2: LDPC base graph 2 and its parity check matrices, see nrLDPCTables.cpp
 		for (unsigned i = 0; i < 197; i++) {
 			mEdges.push_back(edge_t());
-			mEdges[i] = { shiftTableBgn_2[i][0],shiftTableBgn_2[i][1], uint16_t(shiftTableBgn_2[i][mSetIdx + 2] % mZc) };
+			mEdges[i] = { shiftTableBgn_2[i][0],shiftTableBgn_2[i][1], uint16_t(shiftTableBgn_2[i][mSetIdx + 2] % mZc) }; // mEdges[i] = { cNodeIdx , vNodeIdx, nShifts }, see LDPC.h
 		}
 	}
 
@@ -51,7 +51,7 @@ nrLDPC::nrLDPC(size_t infoLen, float codeRate)
 				   {200,205},{205,210},{210,216},{216,221},{221,226},{226,230},{230,235},
 				   {235,240},{240,245},{245,250},{250,255},{255,260},{260,265},{265,270},
 				   {270,275},{275,279},{279,284},{284,289},{289,293},{293,298},{298,302},
-				   {302,307},{307,312},{312,316} };
+				   {302,307},{307,312},{312,316} }; // mLayers[i] = { edgeStart, edgeEnd }, see LDPC.h
 	}
 	else {
 		mLayers = { {0,8},{8,18},{18,26},{26,36},{36,40},{40,46},{46,52},
@@ -60,7 +60,7 @@ nrLDPC::nrLDPC(size_t infoLen, float codeRate)
 				   {113,117},{117,121},{121,124},{124,128},{128,132},{132,135},
 				   {135,140},{140,143},{143,147},{147,150},{150,155},{155,158},
 				   {158,162},{162,166},{166,170},{170,174},{174,178},{178,181},
-				   {181,185},{185,189},{189,193},{193,197} };
+				   {181,185},{185,189},{189,193},{193,197} }; // mLayers[i] = { edgeStart, edgeEnd }, see LDPC.h
 	}
 }
 
@@ -175,12 +175,12 @@ vector<bool> nrLDPC::decode(const vector<float>& softBitsIn, const unsigned nMax
 				VtoCMsg[iEdge] = circShift(VtoCMsg[iEdge], nShifts);
 			}
 			//check node operation
-            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",duration_cast<milliseconds>(steady_clock::now() - sim_time).count()/1e3,snr_g,blk_g,iIter,iLayer);
+            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iLayer);
             steady_clock::time_point check_node_operation_start = steady_clock::now();
 			vector<vector<float>> minSumMsgs = checkNodeOperation(VtoCMsg);
             steady_clock::time_point check_node_operation_end = steady_clock::now();
-            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",duration_cast<milliseconds>(steady_clock::now() - sim_time).count()/1e3,snr_g,blk_g,iIter,iLayer);
-            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %f\n",duration_cast<milliseconds>(steady_clock::now() - sim_time).count()/1e3,snr_g,blk_g,iIter,iLayer,duration_cast<milliseconds>(check_node_operation_end - check_node_operation_start).count()/1e3);
+            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iLayer);
+            printf("[t_sim [s] = %.4f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %f\n",duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iLayer,duration_cast<microseconds>(check_node_operation_end - check_node_operation_start).count()/1e6);
 
 			//message from check node to varible nodes
 			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
@@ -312,7 +312,7 @@ uint8_t nrLDPC::selectBaseGraph(size_t KBar, float R)
 }
 uint16_t nrLDPC::selectLiftSize(size_t KBar, uint8_t BGn)
 {
-	// select kb 3GPP 38.212 section 5.2.2
+	// select Kb 3GPP 38.212 section 5.2.2
 	uint16_t Kb;
 	if (BGn == 1)
 		Kb = 22;
@@ -333,17 +333,18 @@ uint16_t nrLDPC::selectLiftSize(size_t KBar, uint8_t BGn)
 	for (unsigned i = 0; i < 8; i++) {
 		for (unsigned j = 0; j < 8; j++) {
 			candiZc = liftSizeTable[i][j];
-			if (candiZc * Kb == KBar)
+			if (candiZc * Kb == KBar) // found min(Z) such that Kb*Z >= KBar (TS 38212-j40, cap. 5.2.2)
 				return candiZc;
 			else if (candiZc * Kb > KBar && candiZc < Zc)
 				Zc = candiZc;
 		}
 	}
-	return Zc;
+	return Zc; // min(Z) such that Kb*Z >= KBar (TS 38212-j40, cap. 5.2.2)
 }
 uint8_t nrLDPC::selectShiftSet(uint16_t Zc)
+// find the set with index (mSetIdx, i_LS in spec) in Table 5.3.2-1 (see nrLDPCTables.cpp) witch contains mZc (Zc in spec) 
 {
-	assert(Zc >= 2 && Zc <= 384);
+	assert(Zc >= 2 && Zc <= 384); // min(Zc) and max(Zc) (TS 38212-j40, Table 5.3.2-1: Sets of LDPC lifting size Z)
 	for (unsigned i = 0; i < 8; i++) {
 		for (unsigned j = 0; j < 8; j++) {
 			if (liftSizeTable[i][j] == Zc)

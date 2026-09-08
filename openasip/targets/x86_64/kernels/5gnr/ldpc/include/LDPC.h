@@ -21,7 +21,8 @@
 #include <chrono> //timing
 using std::chrono::duration_cast;
 using std::chrono::steady_clock;
-using std::chrono::milliseconds;
+//using std::chrono::milliseconds;
+using std::chrono::microseconds;
 extern steady_clock::time_point sim_time;
 extern steady_clock::time_point check_node_operation_start;
 extern steady_clock::time_point check_node_operation_end;
@@ -47,13 +48,13 @@ struct layer_t {
 
 class nrLDPC {
 public:
-	std::size_t mKBar;          // info length excluding fillers
-	std::size_t mK;             // info length including fillers
-	float      mR;             // code rate
-	uint8_t     mBGn;           // base graph identifier
-	uint16_t    mZc;            // lifting size
-	uint8_t     mSetIdx;        // the set that shift coefficients belongs to 0-7
-	std::size_t mF;             // number of fillers to make info length is 22*Zc 0r 10*Zc
+	std::size_t mKBar;          // info length excluding fillers (K' in 3GPP TS 38.212, cap. 5.2.2)
+	std::size_t mK;             // info length including fillers (K = Kb*Zc in 3GPP TS 38.212, cap. 5.2.2)
+	float      mR;             // code rate (R in in 3GPP TS 38.212, cap. 5.2.2)
+	uint8_t     mBGn;           // base graph identifier (H_BG in 3GPP TS 38.212, cap. 5.3.2)
+	uint16_t    mZc;            // lifting size (Zc in 3GPP TS 38.212, cap. 5.2.2)
+	uint8_t     mSetIdx;        // the set that shift coefficients belongs to 0-7 (i_LS in 3GPP TS 38.212, cap. 5.3.2)
+	std::size_t mF;             // number of fillers to make info length 22*Zc or 10*Zc (K' - K in 3GPP TS 38.212, cap. 5.2.2)
 	std::size_t mN;             // mother code word length
 	// edges are sorted by check node idx and variable node idx
 	std::vector<edge_t> mEdges;

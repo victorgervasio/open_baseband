@@ -4,8 +4,8 @@
 //#include <time.h>
 //#include <cstdio> // sprintf
 #include <stdio.h> //OpenASIP supports it according to the manual
-#include "gen-random/norm_dist.h"
-#include "gen-n0/n0_table.h"
+#include "norm_dist.h"
+#include "n0_table.h"
 using namespace std;
 
 //using etl::chrono::duration_cast;
@@ -40,7 +40,7 @@ void example_run_LDPC(NormDistRandomEngine norm_dist_random_engine)
     sim_time = 0;
     printf("[t_sim [s] = %.6f] Began simulated TTA CPU clock time count\n",sim_time/1e6);
 
-    const char message[MESSAGE_LENGTH] = "Hello NR LDPC!\0";
+    const char message[MESSAGE_LENGTH] = "Hello NR LDPC!";
     etl::vector<bool, MESSAGE_BITS_LENGTH> complete_message = stringToBits(message);
     const unsigned paddingBits = INFO_BITS_LENGTH - MESSAGE_BITS_LENGTH;
     //if (complete_message.size() > INFO_BITS_LENGTH) throw "[Runtime Error] Message too large."; aparently, openasip tte-llvm target won't support exception handling
