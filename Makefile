@@ -42,6 +42,7 @@ RTL_HDL ?= vhdl
 CMAKE ?= cmake
 GIT ?= git
 CMAKE_BUILD_TYPE ?= Release # RelWithDebInfo for getting debug symbols
+WORKTREE_ROOT ?= $(ROOT_DIR)/.worktrees
 
 .PHONY: all build configure ensure-etl ensure-sim-venv
 .PHONY: build-tta build-x86_64 build-almaif
@@ -53,6 +54,7 @@ CMAKE_BUILD_TYPE ?= Release # RelWithDebInfo for getting debug symbols
 .PHONY: analyze-tta analyze-x86_64 analyze-almaif analyze
 .PHONY: clean distclean
 .PHONY: format lint help
+.PHONY: worktree-add worktree-rm
 
 # Every public recipe enters the OpenASIP environment first.  This does not
 # modify the caller's interactive shell; it only affects the shell running
@@ -251,6 +253,41 @@ format: configure
 lint: configure
 	$(SOURCE_TCE)
 	$(CMAKE) --build "$(BUILD_DIR)" --target lint
+
+worktree:
+	@if [[ -z "$(branch)" ]]; then \
+		echo "ERROR: branch is required."; \
+		echo "Usage: make worktree branch=<branch-name>"; \
+		exit 1; \
+	fi
+	@if ! $(GIT) show-ref --verify --quiet "refs/heads/$(branch)"; then \
+		echo "ERROR: local branch '$(branch)' does not exist."; \
+		exit 1; \
+	fi
+	@if [[ -e "$(WORKTREE_ROOT)/$(branch)" ]]; then \
+		echo "ERROR: worktree path already exists:"; \
+		echo "  $(WORKTREE_ROOT)/$(branch)"; \
+		exit 1; \
+	fi
+	mkdir -p "$(WORKTREE_ROOT)"
+	echo "==> Creating worktree for branch '$(branch)'"
+	$(GIT) worktree add "$(WORKTREE_ROOT)/$(branch)" "$(branch)"
+	echo "==> Worktree created:"
+	echo "    $(WORKTREE_ROOT)/$(branch)"
+
+worktree-rm:
+	@if [[ -z "$(branch)" ]]; then \
+		echo "ERROR: branch is required."; \
+		echo "Usage: make worktree-remove branch=<branch-name>"; \
+		exit 1; \
+	fi
+	@if [[ ! -e "$(WORKTREE_ROOT)/$(branch)" ]]; then \
+		echo "ERROR: worktree does not exist:"; \
+		echo "  $(WORKTREE_ROOT)/$(branch)"; \
+		exit 1; \
+	fi
+	echo "==> Removing worktree '$(branch)'"
+	$(GIT) worktree remove "$(WORKTREE_ROOT)/$(branch)"
 
 clean:
 	$(SOURCE_TCE)
