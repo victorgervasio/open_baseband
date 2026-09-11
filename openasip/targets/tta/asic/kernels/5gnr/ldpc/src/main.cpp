@@ -1,6 +1,7 @@
 #include "LDPC.h"
 #include "norm_dist.h"
 #include "n0_table.h"
+#include "payload.h"
 using namespace std;
 
 template <size_t N> etl::vector<bool,MESSAGE_BITS_LENGTH> stringToBits(const char (&text)[N]);
@@ -15,8 +16,7 @@ int main() {
 
 void example_run_LDPC(NormDistRandomEngine norm_dist_random_engine)
 {
-    const char message[MESSAGE_LENGTH] = "Hello NR LDPC!";
-    etl::vector<bool, MESSAGE_BITS_LENGTH> complete_message = stringToBits(message);
+    etl::vector<bool, MESSAGE_BITS_LENGTH> complete_message = stringToBits(message); // from payload.h
     const unsigned paddingBits = INFO_BITS_LENGTH - MESSAGE_BITS_LENGTH;
     if (complete_message.size() > INFO_BITS_LENGTH) {
         return;

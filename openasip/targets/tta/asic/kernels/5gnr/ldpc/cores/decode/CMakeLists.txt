@@ -1,6 +1,6 @@
-set(KERNEL_TARGET "build-tta-asic-kernels-5gnr-ldpc")
-set(KERNEL_NAME "asic_5gnr_ldpc")
-set(ASIC_ADF_FILE "${CMAKE_CURRENT_LIST_DIR}/../../../../../../arch/asic_5gnr_ldpc.adf")
+set(KERNEL_TARGET "build-tta-asic-kernels-5gnr-ldpc-decode")
+set(KERNEL_NAME "asic_5gnr_ldpc_decode")
+set(ASIC_ADF_FILE "${CMAKE_CURRENT_LIST_DIR}/arch/asic_5gnr_ldpc_decode.adf")
 set(ASIC_TPEF_FILE "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}.tpef")
 
 # ---------------------------------------------------------------------------
@@ -20,24 +20,24 @@ endif()
 # Source files
 # ---------------------------------------------------------------------------
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_SOURCES
+    GLOB_RECURSE LDPC_DECODE_TTA_ASIC_SOURCES
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_HEADERS
+    GLOB_RECURSE LDPC_DECODE_TTA_ASIC_HEADERS
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_COMMON_SOURCES
+    GLOB_RECURSE LDPC_TTA_ASIC_SOURCES
     CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/common/src/*.cpp"
+    "${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/common/src/*.cpp"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_COMMON_HEADERS
+    GLOB_RECURSE LDPC_TTA_ASIC_HEADERS
     CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/common/include/*.h"
+    "${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/common/include/*.h"
 )
 file(
     GLOB_RECURSE LDPC_COMMON_SOURCES
@@ -52,17 +52,14 @@ file(
 file(
     GLOB_RECURSE LDPC_OSED_SOURCES
     CONFIGURE_DEPENDS
-    "${OPENASIP_ROOT}/arch/custom/osal/kernels/5gnr/ldpc/*"
+    "${CMAKE_CURRENT_LIST_DIR}/../../../../../../../../arch/custom/osal/kernels/5gnr/ldpc*"
 )
 
 # Generator programs are built separately by targets/common and must not be
 # compiled as part of the TTA kernel.
-list(FILTER LDPC_TTA_ASIC_SOURCES EXCLUDE REGEX "/temp/")
+list(FILTER LDPC_DECODE_TTA_ASIC_SOURCES EXCLUDE REGEX "/temp/")
 list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-n0/")
 list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-random/")
-
-#add_subdirectory(cores/encode)
-#add_subdirectory(cores/decode)
 
 find_program(OACC_EXECUTABLE oacc)
 
@@ -77,10 +74,10 @@ endif()
 # ---------------------------------------------------------------------------
 set(TTA_INCLUDE_FLAGS
     "-I${LDPC_COMMON_GENERATED_DIR}"
-    "-I${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "-I${CMAKE_CURRENT_SOURCE_DIR}/common/include"
     "-I${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/include"
     "-I${ETL_ROOT}/include"
+    "-I${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "-I${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/common/include"
     "-I${OPENASIP_ROOT}/targets/tta/kernels/common/lib/cpp"
     "-I${OPENASIP_ROOT}/targets/common/kernels/lib/cpp"
     "-I${ETL_INSTALL_DIR}/include"
@@ -101,20 +98,20 @@ add_custom_command(
             -fno-exceptions
             -O3
             ${TTA_INCLUDE_FLAGS}
+            ${LDPC_DECODE_TTA_ASIC_SOURCES}
             ${LDPC_TTA_ASIC_SOURCES}
-            ${LDPC_TTA_ASIC_COMMON_SOURCES}
             ${LDPC_COMMON_SOURCES}
             -a "${ASIC_ADF_FILE}"
             -o "${ASIC_TPEF_FILE}"
     DEPENDS
-        ${LDPC_TTA_ASIC_SOURCES}
+        ${LDPC_DECODE_TTA_ASIC_HEADERS}
+        ${LDPC_DECODE_TTA_ASIC_SOURCES}
+
         ${LDPC_TTA_ASIC_HEADERS}
+        ${LDPC_TTA_ASIC_SOURCES}
 
-        ${LDPC_TTA_ASIC_COMMON_SOURCES}
-        ${LDPC_TTA_ASIC_COMMON_HEADERS}
-
-        ${LDPC_COMMON_SOURCES}
         ${LDPC_COMMON_HEADERS}
+        ${LDPC_COMMON_SOURCES}
 
         # Generated common headers.
         "${LDPC_COMMON_N0_TABLE}"
@@ -123,12 +120,13 @@ add_custom_command(
         # TTA architecture.
         "${ASIC_ADF_FILE}"
         "${LDPC_OSED_SOURCES}"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT
-        "Compiling ${KERNEL_NAME} for the OpenASIP TTA asic architecture"
+        "Compiling ${KERNEL_NAME} for the OpenASIP TTA simulation architecture"
     VERBATIM
 )
 
+# Make generation explicit at the target level.
 add_custom_target(${KERNEL_TARGET}
     DEPENDS "${ASIC_TPEF_FILE}"
 )

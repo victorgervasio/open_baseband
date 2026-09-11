@@ -68,8 +68,122 @@ constexpr size_t MAX_CHECK_NODE_DEGREE = 19;
 constexpr size_t MAX_CODEWORD_LENGTH = MAX_PCM_COLS; // max size for ldpc::encode() input, 26112
 constexpr size_t MAX_INFO_NODE_BITS = MAX_KB * MAX_ZC;
 
-#ifndef GLOBAL_VARS
-#define GLOBAL_VARS
+//#ifndef GLOBAL_VARS
+//#define GLOBAL_VARS
+//
+//inline unsigned int snr_g = 0;
+//inline unsigned int blk_g = 0;
+//
+//#endif
+
+#ifdef MULTICORE_TTA
+
+/*
+ * --------------------------------------------------------------------------
+ * Shared memory address space
+ * --------------------------------------------------------------------------
+ *
+*TTA local DMEM
+*┌───────────────────────────────┐
+*│ 0 ... 32767                   │
+*└───────────────────────────────┘
+*              │
+*              ▼
+*shared memory
+*┌───────────────────────────────┐
+*│ ENC_STATUS                    │ +0
+*│ DEC_STATUS                    │ +4
+*│ SIM_TIME                      │ +8
+*│ SNR_G_ID                      │ +12
+*├───────────────────────────────┤
+*│ nrLDPC object                 │ +16
+*│                               │
+*│ NRLDPC_STORAGE_SIZE           │
+*├───────────────────────────────┤
+*│ EXT_MSG                       │
+*│ MAX_INFO_NODE_BITS bytes      │
+*├───────────────────────────────┤
+*│ RM_ENC                        │
+*│ CODE_WORD_BITS_LENGTH bytes   │
+*├───────────────────────────────┤
+*│ LLR                           │
+*│ MAX_CODEWORD_LENGTH floats    │
+*├───────────────────────────────┤
+*│ MSG_CAP                       │
+*│ MAX_INFO_NODE_BITS bytes      │
+*└───────────────────────────────┘
+ *
+ * TTA local DMEM:
+ *
+ *     [0, LAST_DMEM_ADDR]
+ *
+ * Shared memory starts immediately afterwards.
+ *
+ * The first part contains control registers. The remaining regions are
+ * ordinary raw byte/float buffers.
+ */
+
+#define LAST_DMEM_ADDR  (32 * 1024 - 1)
+#define SHARED_MEM_BASE (LAST_DMEM_ADDR + 1)
+
+/*
+ * Control/status registers: pointer addresses
+ *
+ * 0 = processing/busy
+ * 1 = idle/task finished
+ */
+#define ENC_STATUS_ADDR              (SHARED_MEM_BASE + 0 * 4)
+#define DEC_STATUS_ADDR              (SHARED_MEM_BASE + 1 * 4)
+#define SIM_TIME_ADDR                (SHARED_MEM_BASE + 2 * 4)
+#define SNR_G_ID_ADDR                (SHARED_MEM_BASE + 3 * 4)
+#define BLK_G_ID_ADDR                (SHARED_MEM_BASE + 4 * 4)
+#define STARTUP_ADDR                 (SHARED_MEM_BASE + 5 * 4)
+#define FILLER_LENGTH_ADDR           (SHARED_MEM_BASE + 6 * 4)
+#define ACTUAL_CODEWORD_LENGTH_ADDR  (SHARED_MEM_BASE + 7 * 4)
+
+#define ENC_STATUS_PTR ((volatile unsigned int*)ENC_STATUS_ADDR)
+#define DEC_STATUS_PTR ((volatile unsigned int*)DEC_STATUS_ADDR)
+#define SIM_TIME_PTR ((volatile unsigned int*)SIM_TIME_ADDR)
+#define SNR_G_ID_PTR ((volatile unsigned int*)SNR_G_ID_ADDR)
+#define BLK_G_ID_PTR ((volatile unsigned int*)BLK_G_ID_ADDR)
+#define STARTUP_PTR ((volatile unsigned int*)STARTUP_ADDR)
+#define FILLER_LENGTH_PTR ((volatile unsigned int*)FILLER_LENGTH_ADDR)
+#define ACTUAL_CODEWORD_LENGTH_PTR ((volatile unsigned int*)ACTUAL_CODEWORD_LENGTH_ADDR)
+
+/*
+ * --------------------------------------------------------------------------
+ * Persistent LDPC object
+ * --------------------------------------------------------------------------
+ *
+ * Constructed exactly once by the encoder during startup.
+ *
+ * The decoder does NOT construct another nrLDPC object. It obtains the
+ * existing object with:
+ *
+ *     nrLDPC* ldpc =
+ *         reinterpret_cast<nrLDPC*>(NRLDPC_ADDR);
+ */
+#define NRLDPC_ADDR (SHARED_MEM_BASE + 8 * 4)
+
+
+/*
+ * --------------------------------------------------------------------------
+ * Raw data buffers
+ * --------------------------------------------------------------------------
+ *
+ * Keep these after NRLDPC_ADDR.
+ *
+ * NRLDPC_STORAGE_SIZE must be large enough for the actual nrLDPC object.
+ * It is deliberately generous here; you can reduce it after measuring
+ * sizeof(nrLDPC) in the TTA compilation environment.
+ */
+#define NRLDPC_STORAGE_SIZE  (16 * 1024)
+#define EXT_MSG_ADDR (NRLDPC_ADDR + NRLDPC_STORAGE_SIZE)
+#define RM_ENC_ADDR  (EXT_MSG_ADDR + MAX_INFO_NODE_BITS * sizeof(uint8_t))
+#define LLR_ADDR     (RM_ENC_ADDR + CODE_WORD_BITS_LENGTH * sizeof(uint8_t))
+#define MSG_CAP_ADDR (LLR_ADDR + MAX_CODEWORD_LENGTH * sizeof(float))
+
+#else /* single-core TTA */
 
 inline unsigned int snr_g = 0;
 inline unsigned int blk_g = 0;

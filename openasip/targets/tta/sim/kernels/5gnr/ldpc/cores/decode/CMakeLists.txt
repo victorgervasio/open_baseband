@@ -1,7 +1,7 @@
-set(KERNEL_TARGET "build-tta-asic-kernels-5gnr-ldpc")
-set(KERNEL_NAME "asic_5gnr_ldpc")
-set(ASIC_ADF_FILE "${CMAKE_CURRENT_LIST_DIR}/../../../../../../arch/asic_5gnr_ldpc.adf")
-set(ASIC_TPEF_FILE "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}.tpef")
+set(KERNEL_BUILD_TARGET "build-tta-sim-kernels-5gnr-ldpc-decode")
+set(KERNEL_NAME "sim_5gnr_ldpc_decode")
+set(SIM_ADF_FILE "${OPENASIP_ROOT}/arch/sim_5gnr_ldpc_decode.adf")
+set(SIM_TPEF_FILE "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}.tpef")
 
 # ---------------------------------------------------------------------------
 # Common LDPC generated files
@@ -20,24 +20,34 @@ endif()
 # Source files
 # ---------------------------------------------------------------------------
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_SOURCES
+    GLOB_RECURSE LDPC_DECODE_TTA_SIM_SOURCES
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_HEADERS
+    GLOB_RECURSE LDPC_DECODE_TTA_SIM_HEADERS
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_COMMON_SOURCES
+    GLOB_RECURSE LDPC_TTA_SIM_CORES_COMMON_SOURCES
     CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/common/src/*.cpp"
+    "${OPENASIP_ROOT}/targets/tta/sim/kernels/5gnr/ldpc/cores/common/src/*.cpp"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_COMMON_HEADERS
+    GLOB_RECURSE LDPC_TTA_SIM_CORES_COMMON_HEADERS
     CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/common/include/*.h"
+    "${OPENASIP_ROOT}/targets/tta/sim/kernels/5gnr/ldpc/cores/common/include/*.h"
+)
+file(
+    GLOB_RECURSE LDPC_TTA_SIM_COMMON_SOURCES
+    CONFIGURE_DEPENDS
+    "${OPENASIP_ROOT}/targets/tta/sim/kernels/5gnr/ldpc/common/src/*.cpp"
+)
+file(
+    GLOB_RECURSE LDPC_TTA_SIM_COMMON_HEADERS
+    CONFIGURE_DEPENDS
+    "${OPENASIP_ROOT}/targets/tta/sim/kernels/5gnr/ldpc/common/include/*.h"
 )
 file(
     GLOB_RECURSE LDPC_COMMON_SOURCES
@@ -52,17 +62,14 @@ file(
 file(
     GLOB_RECURSE LDPC_OSED_SOURCES
     CONFIGURE_DEPENDS
-    "${OPENASIP_ROOT}/arch/custom/osal/kernels/5gnr/ldpc/*"
+    "${CMAKE_CURRENT_LIST_DIR}/../../../../../../arch/custom/osal/kernels/5gnr/ldpc/*"
 )
 
 # Generator programs are built separately by targets/common and must not be
 # compiled as part of the TTA kernel.
-list(FILTER LDPC_TTA_ASIC_SOURCES EXCLUDE REGEX "/temp/")
+list(FILTER LDPC_TTA_SIM_COMMON_SOURCES EXCLUDE REGEX "/temp/")
 list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-n0/")
 list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-random/")
-
-#add_subdirectory(cores/encode)
-#add_subdirectory(cores/decode)
 
 find_program(OACC_EXECUTABLE oacc)
 
@@ -77,58 +84,66 @@ endif()
 # ---------------------------------------------------------------------------
 set(TTA_INCLUDE_FLAGS
     "-I${LDPC_COMMON_GENERATED_DIR}"
-    "-I${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "-I${CMAKE_CURRENT_SOURCE_DIR}/common/include"
     "-I${OPENASIP_ROOT}/targets/common/kernels/5gnr/ldpc/include"
     "-I${ETL_ROOT}/include"
+    "-I${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "-I${OPENASIP_ROOT}/targets/tta/sim/kernels/5gnr/ldpc/common/include"
+    "-I${OPENASIP_ROOT}/targets/tta/sim/kernels/5gnr/ldpc/cores/common/include"
     "-I${OPENASIP_ROOT}/targets/tta/kernels/common/lib/cpp"
     "-I${OPENASIP_ROOT}/targets/common/kernels/lib/cpp"
     "-I${ETL_INSTALL_DIR}/include"
 
     # Use ETL's numeric implementation in the common norm_dist.h.
     "-DLDPC_USE_ETL"
+
+    # See defines.h
+    "-DMULTICORE_TTA"
 )
 
 # ---------------------------------------------------------------------------
 # Generated .tpef program
 # ---------------------------------------------------------------------------
 add_custom_command(
-    OUTPUT "${ASIC_TPEF_FILE}"
+    OUTPUT "${SIM_TPEF_FILE}"
     COMMAND "${OACC_EXECUTABLE}"
             --swfp
             -V
-            -DNDEBUG
             -fno-exceptions
             -O3
             ${TTA_INCLUDE_FLAGS}
-            ${LDPC_TTA_ASIC_SOURCES}
-            ${LDPC_TTA_ASIC_COMMON_SOURCES}
+            ${LDPC_DECODE_TTA_SIM_SOURCES}
+            ${LDPC_TTA_SIM_CORES_COMMON_SOURCES}
+            ${LDPC_TTA_SIM_COMMON_SOURCES}
             ${LDPC_COMMON_SOURCES}
-            -a "${ASIC_ADF_FILE}"
-            -o "${ASIC_TPEF_FILE}"
+            -a "${SIM_ADF_FILE}"
+            -o "${SIM_TPEF_FILE}"
     DEPENDS
-        ${LDPC_TTA_ASIC_SOURCES}
-        ${LDPC_TTA_ASIC_HEADERS}
+        ${LDPC_DECODE_TTA_SIM_HEADERS}
+        ${LDPC_DECODE_TTA_SIM_SOURCES}
 
-        ${LDPC_TTA_ASIC_COMMON_SOURCES}
-        ${LDPC_TTA_ASIC_COMMON_HEADERS}
+        ${LDPC_TTA_SIM_CORES_COMMON_HEADERS}
+        ${LDPC_TTA_SIM_CORES_COMMON_SOURCES}
 
-        ${LDPC_COMMON_SOURCES}
+        ${LDPC_TTA_SIM_COMMON_HEADERS}
+        ${LDPC_TTA_SIM_COMMON_SOURCES}
+
         ${LDPC_COMMON_HEADERS}
+        ${LDPC_COMMON_SOURCES}
 
         # Generated common headers.
         "${LDPC_COMMON_N0_TABLE}"
         "${LDPC_COMMON_NORMAL_SAMPLES}"
 
         # TTA architecture.
-        "${ASIC_ADF_FILE}"
+        "${SIM_ADF_FILE}"
         "${LDPC_OSED_SOURCES}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMENT
-        "Compiling ${KERNEL_NAME} for the OpenASIP TTA asic architecture"
+        "Compiling ${KERNEL_NAME} for the OpenASIP TTA simulation architecture"
     VERBATIM
 )
 
-add_custom_target(${KERNEL_TARGET}
-    DEPENDS "${ASIC_TPEF_FILE}"
+# Make generation explicit at the target level.
+add_custom_target(${KERNEL_BUILD_TARGET}
+    DEPENDS "${SIM_TPEF_FILE}"
 )
