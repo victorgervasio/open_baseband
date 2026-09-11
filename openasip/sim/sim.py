@@ -144,8 +144,8 @@ def config_logger(sim_root=None):
     return logger, date_and_hour_logger, new_log_dir
 
 
-def main(logger,target,ttasim_flags,adf_file,tpef_file,simulator,sim_root,x86_64_program=None,x86_64_program_args=None):
-    if target == 'tta':
+def main(logger,target,systemC,ttasim_flags,adf_file,tpef_file,simulator,sim_root,x86_64_program=None,x86_64_program_args=None):
+    if target == 'tta' and not systemC:
         cmd = [simulator]
         if ttasim_flags:
             for flag in ttasim_flags:
@@ -153,7 +153,7 @@ def main(logger,target,ttasim_flags,adf_file,tpef_file,simulator,sim_root,x86_64
         cmd += ["-a",fr"{adf_file}"]
         cmd += ["-p",fr"{tpef_file}"] 
         logger.info(fr"Starting {simulator}...")
-    else: # x86_64
+    else: # x86_64 or tta-SystemC
         cmd = [fr"{x86_64_program}"]
         if x86_64_program_args:
             for arg in x86_64_program_args:
@@ -162,26 +162,28 @@ def main(logger,target,ttasim_flags,adf_file,tpef_file,simulator,sim_root,x86_64
 
     success, ret_code = run_subprocess(logger,cmd)
     
-    if target == 'tta':
+    if target == 'tta' and not systemC:
         if not success:
             logger.error(f"{simulator} failed with return code %d", ret_code)
-    else: # x86_64
+    else: # x86_64 or tta-SystemC
         if not success:
             logger.error(f"{x86_64_program} failed with return code %d", ret_code)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-t','--target',choices=['tta','x86_64'],required=True,help='Architecture target for simulated program.')
+    parser.add_argument('-C','--systemC',action='store_true',help='Indicate if program is SystemC multicore simulation.')
     parser.add_argument('-s','--simulator',choices=['ttasim','proxim'],default='ttasim')
-    parser.add_argument('-f','--ttasim_flags',nargs="+",type=str,help="Spaced list of flags/options to pass to ttasim. See 'ttasim --help' for more info.")
+    parser.add_argument('-f','--ttasim_flags',nargs="+",help="Spaced list of flags/options to pass to ttasim. See 'ttasim --help' for more info.")
     parser.add_argument('-a','--adf_file',type=str,help="*.adf file")
     parser.add_argument('-p','--tpef_file',type=str,help="*.tpef file.")
     parser.add_argument('-d','--sim_root',type=str,help="simulation root dir (implicitly defaults, in code, to open_baseband/openasip/sim)")
     parser.add_argument('-e','--x86_64_program',type=str,help="x86_64 program for simulation.")
-    parser.add_argument('-r','--x86_64_program_args',nargs="+",type=str,help="Spaced list of arguments to pass to x86_64 program.")
+    parser.add_argument('-r','--x86_64_program_args',nargs='+',help="Spaced list of arguments to pass to x86_64 program.")
     args = parser.parse_args()
     
     target = args.target
+    systemC = args.systemC
     simulator = args.simulator
     ttasim_flags = args.ttasim_flags
     adf_file = args.adf_file
@@ -195,10 +197,10 @@ if __name__ == '__main__':
     if target == "tta":
         incompatible_options = []
 
-        if x86_64_program:
+        if x86_64_program and not systemC:
             incompatible_options.append(f"--x86_64_program={x86_64_program}")
 
-        if x86_64_program_args:
+        if x86_64_program_args and not systemC:
             incompatible_options.append("--x86_64_program_args={" ".join(x86_64_program_args)}")
 
     elif target == "x86_64":
@@ -236,13 +238,14 @@ if __name__ == '__main__':
         "branch": branch,
         "git_working_tree": working_tree,
         "simulation_target": target,
-        "adf": 'N/A' if target == 'x86_64' else str(Path(adf_file).resolve()),
-        "tpef": 'N/A' if target == 'x86_64' else str(Path(tpef_file).resolve()),
-        "compiler": 'g++' if target == 'x86_64' else 'clang',
-        "simulator": 'N/A' if target == 'x86_64' else simulator,
-        "ttasim_flags": ['N/A'] if target == 'x86_64' else [ttasim_flags],
-        "program": str(Path(x86_64_program).resolve()) if target == 'x86_64' else 'N/A',
-        "program_args": [x86_64_program_args] if target == 'x86_64' else ['N/A']
+        "systemC": systemC,
+        "adf": 'N/A' if (target == 'x86_64' or systemC) else str(Path(adf_file).resolve()),
+        "tpef": 'N/A' if (target == 'x86_64' or systemC) else str(Path(tpef_file).resolve()),
+        "compiler": 'g++' if (target == 'x86_64' or systemC) else 'clang',
+        "simulator": 'N/A' if (target == 'x86_64' or systemC) else simulator,
+        "ttasim_flags": ['N/A'] if (target == 'x86_64' or systemC) else ttasim_flags,
+        "program": str(Path(x86_64_program).resolve()) if (target == 'x86_64' or systemC) else 'N/A',
+        "program_args": x86_64_program_args if (target == 'x86_64' or systemC) else ['N/A']
     }
     
     print("\n")
@@ -257,6 +260,7 @@ if __name__ == '__main__':
     Git working tree:  '{run_info_obj['git_working_tree']}'
     
     Simulation target: '{run_info_obj['simulation_target']}'
+    SystemC:           '{run_info_obj['systemC']}'
     ADF:               '{run_info_obj['adf']}'
     TPEF:              '{run_info_obj['tpef']}'
     Compiler:          '{run_info_obj['compiler']}'
@@ -271,4 +275,4 @@ if __name__ == '__main__':
     with open(run_info_path, "w", encoding="utf-8") as json_file:
         json.dump(run_info_obj, json_file, indent=4)
     
-    main(logger,target,ttasim_flags,adf_file,tpef_file,simulator,sim_root,x86_64_program,x86_64_program_args)
+    main(logger,target,systemC,ttasim_flags,adf_file,tpef_file,simulator,sim_root,x86_64_program,x86_64_program_args)

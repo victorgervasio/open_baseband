@@ -93,6 +93,38 @@
           }
         ]
       }
+    },
+    "Python: Debug sim.py (tta-systemC) - open_baseband/openasip/sim venv": {
+      "adapter": "debugpy",
+      "breakpoints": {
+        "exception": {
+          "raised": "N",
+          "uncaught": "Y",
+          "userUnhandled": "N"
+        }
+      },
+      "configuration": {
+        "python": "../../build/openasip/sim/venv/bin/python3",
+        "request": "launch",
+        "type": "python",
+        "cwd": "${workspaceRoot}",
+        "program": "sim.py",
+        "args": [
+            "--target", "tta",
+            "--systemC",
+            "--sim_root", "../../build/openasip/build-tta/openasip/sim",
+            "--x86_64_program", "../../build/openasip/build-tta/openasip/targets/tta/sim/kernels/${tech}/${kernel}/sim_${tech}_${kernel}",
+            "--x86_64_program_args", "${argv1}", "${argv2}", "${argv3}", "${argv4}"
+        ],
+        "console": "integratedTerminal",
+        "breakpoints": {
+          "exception": {
+            "all": "N",
+            "uncaught": "Y"
+          }
+        },
+        "stopOnEntry": false
+      }
     }
   }
 }

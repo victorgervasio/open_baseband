@@ -9,3 +9,4 @@ openasip/targets/common/kernels/lib/cpp/etl/
 openasip/sim/venv/
 openasip/sim/log/
 *.hdb
+*.swp

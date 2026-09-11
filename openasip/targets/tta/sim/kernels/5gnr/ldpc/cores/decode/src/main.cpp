@@ -16,8 +16,41 @@ int main() {
     volatile unsigned int sim_time = 0;
     unsigned int step_time_start = 0;
     unsigned int step_time_end = 0;
+    
+    /*DEBUG*/
+    _TCE_RTC(1, sim_time);
+    printf("[t_sim (decode) [s] = %.6f] DEC_STATUS_PTR = %p\n",sim_time/1e6,
+           (void*)DEC_STATUS_PTR);
+
+    printf("[t_sim (decode) [s] = %.6f] STARTUP_PTR = %p\n",sim_time/1e6,
+           (void*)STARTUP_PTR);
+
+    printf("[t_sim (decode) [s] = %.6f] NRLDPC_ADDR = %p\n",sim_time/1e6,
+           (void*)NRLDPC_ADDR);
+
+    printf("[t_sim (decode) [s] = %.6f] DEC_STATUS initial = %u\n",sim_time/1e6,
+           *DEC_STATUS_PTR);
+
+    printf("[t_sim (decode) [s] = %.6f] STARTUP initial = %u\n",sim_time/1e6,
+           *STARTUP_PTR);
+    /*DEBUG*/
+    
+    while (!*STARTUP_PTR) {}
+
     do {
-        while (*DEC_STATUS_PTR) {} // Wait for Top-Level to clear the flag to 0, which signals "New Data Ready to Encode"
+        //while (*DEC_STATUS_PTR) {} // Wait for Top-Level to clear the flag to 0, which signals "New Data Ready to Encode"
+        /*DEBUG*/
+        while (*DEC_STATUS_PTR)
+        {
+            //_TCE_RTC(1, sim_time);
+
+            //if ((sim_time % 1000) == 0)
+            //    printf("[t_sim] (decode) [s] = %.6f] decoder waiting: DEC_STATUS=%u STARTUP=%u\n",
+            //            sim_time/1e6,
+            //           *DEC_STATUS_PTR,
+            //           *STARTUP_PTR);
+        }
+        /*DEBUG*/
         // 2. ATTRIBUTION/READING: Fetch the updated primitive values at the start of the loop
         unsigned int snr_g_id = *snr_g_id_ptr; 
         

@@ -53,6 +53,11 @@ constexpr int INFO_LENGTH = INFO_BITS_LENGTH / 8; //41
 #define N_MAX_BLKS 10
 #endif
 
+#ifndef N_MAX_BLKS_ERRS
+//#define N_MAX_BLKS_ERRS 100
+#define N_MAX_BLKS_ERRS 3
+#endif
+
 #ifndef EXT_MSG_LENGTH
 #define EXT_MSG_LENGTH 3200
 #endif
@@ -126,6 +131,8 @@ constexpr size_t MAX_INFO_NODE_BITS = MAX_KB * MAX_ZC;
 #define LAST_DMEM_ADDR  (32 * 1024 - 1)
 #define SHARED_MEM_BASE (LAST_DMEM_ADDR + 1)
 
+#define SHARED_MEMORY_SIZE (1024 * 1024)
+#define SHARED_MEM_END    (SHARED_MEM_BASE + SHARED_MEMORY_SIZE)
 /*
  * Control/status registers: pointer addresses
  *

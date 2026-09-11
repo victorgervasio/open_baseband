@@ -13,7 +13,7 @@ nrLDPC::nrLDPC(size_t infoLen, float codeRate)
 
 	// select lifting size
 	mZc = selectLiftSize(mKBar, mBGn);
-
+    //printf("mZc: %i",mZc);
 	// select shifting set
 	mSetIdx = selectShiftSet(mZc);
 
@@ -74,7 +74,16 @@ etl::vector<bool,MAX_CODEWORD_LENGTH> nrLDPC::encode(const etl::vector<bool,MAX_
 	else {
 		Kb = 10; Cb = 52; totLayers = 42;
 	}
-
+    
+    /*DEBUG*/
+    printf(
+        "ENCODER: Kb=%i mZc=%i expected=%i msg.size=%i\n",
+        Kb,
+        mZc,
+        Kb * mZc,
+        msg.size()
+    );
+    /*DEBUG*/
 	assert(Kb * mZc == msg.size());
 
 	// initialize encoded bits in nodes(vectors of size Zc)
@@ -499,6 +508,7 @@ uint16_t nrLDPC::selectLiftSize(size_t KBar, uint8_t BGn) // for 'Hello NR LDPC!
 				Zc = candiZc;
 		}
 	}
+    //printf("final Zc: %i",Zc);
 	return Zc;
 }
 uint8_t nrLDPC::selectShiftSet(uint16_t Zc)

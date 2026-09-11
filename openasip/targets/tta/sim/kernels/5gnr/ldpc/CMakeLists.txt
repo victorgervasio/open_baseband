@@ -168,11 +168,14 @@ target_compile_options(${KERNEL_BUILD_TARGET} PRIVATE
     $<$<CONFIG:Release>:-O3>
 
     $<$<CONFIG:Debug>:-g3>
+    $<$<CONFIG:Debug>:-O0>
     $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 
+    $<$<CONFIG:RelWithDebInfo>:-O2>
     $<$<CONFIG:RelWithDebInfo>:-g3>
-    $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>)
+    $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>
+)
 
 # ---------------------------------------------------------------------------
 # Link options
@@ -201,11 +204,25 @@ target_link_libraries(${KERNEL_BUILD_TARGET}
 #
 # No TPEF generation is performed by this simulation target itself.
 # ---------------------------------------------------------------------------
+#add_custom_target(${KERNEL_SIM_TARGET}
+#    COMMAND "$<TARGET_FILE:${KERNEL_BUILD_TARGET}>"
+#            "${SIM_ENCODE_ADF_FILE}"
+#            "${SIM_ENCODE_TPEF_FILE}"
+#            "${SIM_DECODE_ADF_FILE}"
+#            "${SIM_DECODE_TPEF_FILE}"
+#    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+#    USES_TERMINAL)
 add_custom_target(${KERNEL_SIM_TARGET}
-    COMMAND "$<TARGET_FILE:${KERNEL_BUILD_TARGET}>"
+    COMMAND "${Python3_EXECUTABLE}"
+            "${OPENBASEBAND_SIM_PY}"
+            --target tta --systemC
+            --sim_root "${SIM_OUTPUT_DIR}"
+            --x86_64_program "${TTA_SIM_PROGRAM}"
+            --x86_64_program_args
             "${SIM_ENCODE_ADF_FILE}"
             "${SIM_ENCODE_TPEF_FILE}"
             "${SIM_DECODE_ADF_FILE}"
             "${SIM_DECODE_TPEF_FILE}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    USES_TERMINAL)
+    USES_TERMINAL
+)

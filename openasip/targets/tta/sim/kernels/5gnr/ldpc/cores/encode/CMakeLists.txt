@@ -92,6 +92,9 @@ set(TTA_INCLUDE_FLAGS
     "-I${OPENASIP_ROOT}/targets/tta/kernels/common/lib/cpp"
     "-I${OPENASIP_ROOT}/targets/common/kernels/lib/cpp"
     "-I${ETL_INSTALL_DIR}/include"
+    
+    # Disable assertions.
+    "-DNDEBUG"
 
     # Use ETL's numeric implementation in the common norm_dist.h.
     "-DLDPC_USE_ETL"
