@@ -254,7 +254,7 @@ lint: configure
 	$(SOURCE_TCE)
 	$(CMAKE) --build "$(BUILD_DIR)" --target lint
 
-worktree:
+worktree-add:
 	@if [[ -z "$(branch)" ]]; then \
 		echo "ERROR: branch is required."; \
 		echo "Usage: make worktree branch=<branch-name>"; \
