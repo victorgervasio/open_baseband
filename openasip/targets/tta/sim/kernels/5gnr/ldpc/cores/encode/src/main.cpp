@@ -7,31 +7,31 @@ void encode_blk(const etl::vector<bool,MAX_INFO_NODE_BITS>& extMsg, etl::vector<
 
 int main() {
     /*DEBUG*/
-    fprintf(
-        stderr,
-        "[ENCODER] sizeof(nrLDPC) = %zu bytes (%.2f KiB)\n",
-        sizeof(nrLDPC),
-        static_cast<double>(sizeof(nrLDPC)) / 1024.0);
+    //fprintf(
+    //    stderr,
+    //    "[ENCODER] sizeof(nrLDPC) = %zu bytes (%.2f KiB)\n",
+    //    sizeof(nrLDPC),
+    //    static_cast<double>(sizeof(nrLDPC)) / 1024.0);
 
-    fprintf(
-        stderr,
-        "[ENCODER] NRLDPC_ADDR         = 0x%08x\n",
-        NRLDPC_ADDR);
+    //fprintf(
+    //    stderr,
+    //    "[ENCODER] NRLDPC_ADDR         = 0x%08x\n",
+    //    NRLDPC_ADDR);
 
-    fprintf(
-        stderr,
-        "[ENCODER] NRLDPC_END          = 0x%08x\n",
-        NRLDPC_ADDR + NRLDPC_STORAGE_SIZE);
+    //fprintf(
+    //    stderr,
+    //    "[ENCODER] NRLDPC_END          = 0x%08x\n",
+    //    NRLDPC_ADDR + NRLDPC_STORAGE_SIZE);
 
-    fprintf(
-        stderr,
-        "[ENCODER] EXT_MSG_ADDR        = 0x%08x\n",
-        EXT_MSG_ADDR);
+    //fprintf(
+    //    stderr,
+    //    "[ENCODER] EXT_MSG_ADDR        = 0x%08x\n",
+    //    EXT_MSG_ADDR);
 
-    fprintf(
-        stderr,
-        "[ENCODER] object theoretical end = 0x%08x\n",
-        NRLDPC_ADDR + sizeof(nrLDPC));
+    //fprintf(
+    //    stderr,
+    //    "[ENCODER] object theoretical end = 0x%08x\n",
+    //    NRLDPC_ADDR + sizeof(nrLDPC));
     /*DEBUG*/
     // 1. DECLARATION: Map the structures directly onto the shared memory regions
     volatile const unsigned int* snr_g_id_ptr = SNR_G_ID_PTR;
@@ -46,17 +46,17 @@ int main() {
     volatile unsigned int step_time_end = 0;
     
     /*DEBUG*/
-    _TCE_RTC(1, sim_time);
-    printf("[t_sim (encode) [s] = %.6f] ENC sees STARTUP=%u\n",sim_time/1e6, *STARTUP_PTR);
-    printf("[t_sim (encode) [s] = %.6f] ENC sees ENC_STATUS=%u\n",sim_time/1e6, *ENC_STATUS_PTR);
-    printf("[t_sim (encode) [s] = %.6f] ENC sees DEC_STATUS=%u\n",sim_time/1e6, *DEC_STATUS_PTR);
+    //_TCE_RTC(1, sim_time);
+    //printf("[t_sim (encode) [s] = %.6f] ENC sees STARTUP=%u\n",sim_time/1e6, *STARTUP_PTR);
+    //printf("[t_sim (encode) [s] = %.6f] ENC sees ENC_STATUS=%u\n",sim_time/1e6, *ENC_STATUS_PTR);
+    //printf("[t_sim (encode) [s] = %.6f] ENC sees DEC_STATUS=%u\n",sim_time/1e6, *DEC_STATUS_PTR);
     /*DEBUG*/
 
     // nrLDPC initiazitation
     _TCE_RTC(1, sim_time);
     printf("[t_sim (encode) [s] = %.6f] Began shared nrLDPC object instantiation!\n",sim_time/1e6);
-    printf("[t_sim (encode) [s] = %.6f] infoLen: %i\n",sim_time/1e6,INFO_BITS_LENGTH);
-    printf("[t_sim (encode) [s] = %.6f] codeRate: %f\n",sim_time/1e6,CODE_RATE);
+    //printf("[t_sim (encode) [s] = %.6f] infoLen: %i\n",sim_time/1e6,INFO_BITS_LENGTH);
+    //printf("[t_sim (encode) [s] = %.6f] codeRate: %f\n",sim_time/1e6,CODE_RATE);
     _TCE_RTC(1, step_time_start);
     initializeLDPC(INFO_BITS_LENGTH, CODE_RATE); 
     _TCE_RTC(1, step_time_end);
@@ -74,30 +74,30 @@ int main() {
     /*DEBUG*/
     //*FILLER_LENGTH_PTR = static_cast<unsigned>(reinterpret_cast<nrLDPC*>(NRLDPC_ADDR)->getFillerLength());
     /*DEBUG*/
-    fprintf(
-        stderr,
-        "\n========== BEFORE getFillerLength ==========\n");
+    //fprintf(
+    //    stderr,
+    //    "\n========== BEFORE getFillerLength ==========\n");
 
     unsigned filler =
         static_cast<unsigned>(reinterpret_cast<nrLDPC*>(NRLDPC_ADDR)->getFillerLength());
 
-    fprintf(
-        stderr,
-        "========== AFTER getFillerLength: %u ==========\n",
-        filler);
+    //fprintf(
+    //    stderr,
+    //    "========== AFTER getFillerLength: %u ==========\n",
+    //    filler);
 
     *FILLER_LENGTH_PTR = filler;
 
     //return 0;
     /*DEBUG*/
-    printf("[t_sim (encode) [s] = %.6f] Shared nrLDPC object correspondent Filler Length: %i\n",sim_time/1e6,*FILLER_LENGTH_PTR);
+    //printf("[t_sim (encode) [s] = %.6f] Shared nrLDPC object correspondent Filler Length: %i\n",sim_time/1e6,*FILLER_LENGTH_PTR);
     *STARTUP_PTR = 1;
 
     /*DEBUG*/
-    _TCE_RTC(1, sim_time);
-    printf("[t_sim (encode) [s] = %.6f] ENC sees STARTUP=%u\n",sim_time/1e6, *STARTUP_PTR);
-    printf("[t_sim (encode) [s] = %.6f] ENC sees ENC_STATUS=%u\n",sim_time/1e6, *ENC_STATUS_PTR);
-    printf("[t_sim (encode) [s] = %.6f] ENC sees DEC_STATUS=%u\n",sim_time/1e6, *DEC_STATUS_PTR);
+    //_TCE_RTC(1, sim_time);
+    //printf("[t_sim (encode) [s] = %.6f] ENC sees STARTUP=%u\n",sim_time/1e6, *STARTUP_PTR);
+    //printf("[t_sim (encode) [s] = %.6f] ENC sees ENC_STATUS=%u\n",sim_time/1e6, *ENC_STATUS_PTR);
+    //printf("[t_sim (encode) [s] = %.6f] ENC sees DEC_STATUS=%u\n",sim_time/1e6, *DEC_STATUS_PTR);
     /*DEBUG*/
 
     do {

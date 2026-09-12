@@ -191,6 +191,11 @@ if __name__ == '__main__':
     sim_root = args.sim_root
     x86_64_program = args.x86_64_program
     x86_64_program_args = args.x86_64_program_args
+    
+    if ttasim_flags is None:
+        ttasim_flags = []
+    if x86_64_program_args is None:
+        x86_64_program_args = []
 
     logger, date_and_hour_logger, new_log_dir = config_logger(sim_root)
 

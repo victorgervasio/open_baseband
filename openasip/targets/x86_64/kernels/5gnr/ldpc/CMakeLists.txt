@@ -65,6 +65,7 @@ target_link_libraries(
 target_compile_options(
     ${KERNEL_BUILD_TARGET}
     PRIVATE
+        $<$<CONFIG:Release>:-O3>
         $<$<CONFIG:Debug>:-g3>
         $<$<CONFIG:RelWithDebInfo>:-g3>
         $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>

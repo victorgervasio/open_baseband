@@ -76,13 +76,13 @@ etl::vector<bool,MAX_CODEWORD_LENGTH> nrLDPC::encode(const etl::vector<bool,MAX_
 	}
     
     /*DEBUG*/
-    printf(
-        "ENCODER: Kb=%i mZc=%i expected=%i msg.size=%i\n",
-        Kb,
-        mZc,
-        Kb * mZc,
-        msg.size()
-    );
+    //printf(
+    //    "ENCODER: Kb=%i mZc=%i expected=%i msg.size=%i\n",
+    //    Kb,
+    //    mZc,
+    //    Kb * mZc,
+    //    msg.size()
+    //);
     /*DEBUG*/
 	assert(Kb * mZc == msg.size());
 
@@ -156,109 +156,89 @@ etl::vector<bool, MAX_INFO_NODE_BITS> nrLDPC::decode(const etl::vector<float, MA
     volatile unsigned int checkNodeOperation_core_start = 0;
     volatile unsigned int checkNodeOperation_core_end = 0;
 
-	assert(softBitsIn.size() == mN);
+    assert(softBitsIn.size() == mN);
 
-	// initialize LLR in blocks(nodes), each node with Zc bits
     etl::vector<etl::vector<float, MAX_ZC>, MAX_CB> LLR(mN / mZc);
-	for (unsigned i = 0; i < mN / mZc; i++) {
-		LLR[i] = etl::vector<float, MAX_ZC>(softBitsIn.begin() + i * mZc, softBitsIn.begin() + (i + 1) * mZc);
-	}
+    for (unsigned i = 0; i < mN / mZc; i++) {
+        LLR[i] = etl::vector<float, MAX_ZC>(softBitsIn.begin() + i * mZc, softBitsIn.begin() + (i + 1) * mZc);
+    }
 
-	// find how many parity nodes to use for decoding
-	unsigned nMaxLayer;
-	if (mBGn == 1) {
-		// assume tx bits length =  ceil(kBar/R), alternatively can use all layers(slower)
-		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 20;
+    unsigned nMaxLayer;
+    if (mBGn == 1) {
         nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 20;
     } else {
-		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 8;
         nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 8;
-	}
+    }
 
-	// initialize msg from check nodes to vector nodes, each edge correspond a message
     etl::vector<etl::vector<float, MAX_ZC>, MAX_EDGES> CtoVMsg(mEdges.size());
     int my_iter = 0;
-	for (auto& e : CtoVMsg) {
+    for (auto& e : CtoVMsg) {
         my_iter++;
-		e = etl::vector<float,MAX_ZC>(mZc, 0);
-	}
-	// llr updates
-	unsigned nLayerEdges, edgeIdx, nShifts, vNodeIdx;
-	for (unsigned iIter = 0; iIter < nMaxIter; iIter++) {
-		for (unsigned iLayer = 0; iLayer < nMaxLayer; iLayer++) {
-			nLayerEdges = mLayers[iLayer].edgeEnd - mLayers[iLayer].edgeStart;
-			// messages from variable nodes to check node
+        e = etl::vector<float,MAX_ZC>(mZc, 0);
+    }
+
+    unsigned nLayerEdges, edgeIdx, nShifts, vNodeIdx;
+    for (unsigned iIter = 0; iIter < nMaxIter; iIter++) {
+        for (unsigned iLayer = 0; iLayer < nMaxLayer; iLayer++) {
+            nLayerEdges = mLayers[iLayer].edgeEnd - mLayers[iLayer].edgeStart;
             etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE> VtoCMsg(nLayerEdges);
             my_iter = 0;
-			for (auto& e : VtoCMsg) {
+            for (auto& e : VtoCMsg) {
                 my_iter++;
-				e = etl::vector<float,MAX_ZC>(mZc, 0);
-			}
-			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
-				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
-				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
-				LLR[vNodeIdx] = eleWiseMinus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
-				VtoCMsg[iEdge] = LLR[vNodeIdx];
-				VtoCMsg[iEdge] = circShift(VtoCMsg[iEdge], nShifts);
-			}
+                e = etl::vector<float,MAX_ZC>(mZc, 0);
+            }
+            for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
+                edgeIdx = mLayers[iLayer].edgeStart + iEdge;
+                vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
+                LLR[vNodeIdx] = eleWiseMinus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
+                VtoCMsg[iEdge] = LLR[vNodeIdx];
+                VtoCMsg[iEdge] = circShift(VtoCMsg[iEdge], nShifts);
+            }
             volatile const unsigned int* snr_g_id_ptr = SNR_G_ID_PTR;
             unsigned int snr_g_id = *snr_g_id_ptr;
             volatile const unsigned int* blk_g_id_ptr = BLK_G_ID_PTR;
             unsigned int blk_g_id = *blk_g_id_ptr;
-			//check node operation
-            _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
+            _TCE_RTC(1, sim_time);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
-            _TCE_RTC(1, check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-            //etl::vector<etl::vector<float,MAX_ZC>,MAX_CHECK_NODE_DEGREE> minSumMsgs = checkNodeOperation(VtoCMsg);
-            
-            _TCE_RTC(1, minSumMsgs_start); // OpenASIP 2.0 doc (search for printf explanation)
+            _TCE_RTC(1, check_node_operation_start);
+            _TCE_RTC(1, minSumMsgs_start);
             etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE> minSumMsgs(nLayerEdges);
-            _TCE_RTC(1, minSumMsgs_end); // OpenASIP 2.0 doc (search for printf explanation)
-            
-            _TCE_RTC(1, minSumMsgs_loop_start); // OpenASIP 2.0 doc (search for printf explanation)
+            _TCE_RTC(1, minSumMsgs_end);
+            _TCE_RTC(1, minSumMsgs_loop_start);
             for (auto& e : minSumMsgs)
-                e = etl::vector<float, MAX_ZC>(mZc, 0);
-            _TCE_RTC(1, minSumMsgs_loop_end); // OpenASIP 2.0 doc (search for printf explanation)
-                                        
-            _TCE_RTC(1, checkNodeOperation_core_start); // OpenASIP 2.0 doc (search for printf explanation)
+                e = etl::vector<float,MAX_ZC>(mZc, 0);
+            _TCE_RTC(1, minSumMsgs_loop_end);
+            _TCE_RTC(1, checkNodeOperation_core_start);
             checkNodeOperation(VtoCMsg, minSumMsgs);
-            _TCE_RTC(1, checkNodeOperation_core_end); // OpenASIP 2.0 doc (search for printf explanation)
-
+            _TCE_RTC(1, checkNodeOperation_core_end);
             _TCE_RTC(1,check_node_operation_end);
-            _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
+            _TCE_RTC(1, sim_time);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] minSumMsgs elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(minSumMsgs_end - minSumMsgs_start)/1e6);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] minSumMsgs_loop elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(minSumMsgs_loop_end - minSumMsgs_loop_start)/1e6);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation_core elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(checkNodeOperation_core_end - checkNodeOperation_core_start)/1e6);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
-
-			//message from check node to varible nodes
-			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
-				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
-				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
-				CtoVMsg[edgeIdx] = circShift(minSumMsgs[iEdge], mZc - nShifts);
-				LLR[vNodeIdx] = eleWisePlus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
-			}
-		}
-	}
-	// flatten the 2-D vector LLR
+            for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
+                edgeIdx = mLayers[iLayer].edgeStart + iEdge;
+                vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
+                CtoVMsg[edgeIdx] = circShift(minSumMsgs[iEdge], mZc - nShifts);
+                LLR[vNodeIdx] = eleWisePlus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
+            }
+        }
+    }
     etl::vector<float, MAX_CODEWORD_LENGTH> vecLLR;
     my_iter = 0;
-	for (auto e : LLR) {
+    for (auto e : LLR) {
         my_iter++;
-		vecLLR.insert(vecLLR.end(), e.begin(), e.end());
-	}
-	//vecLLR.erase(vecLLR.end() - mF, vecLLR.end());
-
-	// chose information bits
+        vecLLR.insert(vecLLR.end(), e.begin(), e.end());
+    }
     etl::vector<bool, MAX_INFO_NODE_BITS> decBits(mKBar, false);
     my_iter = 0;
-	for (unsigned i = 0; i < mKBar; i++) {
+    for (unsigned i = 0; i < mKBar; i++) {
         my_iter++;
-		decBits[i] = (vecLLR[i] <= 0);
-	}
-
-	return decBits;
+        decBits[i] = (vecLLR[i] <= 0);
+    }
+    return decBits;
 }
 
 //etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE>
@@ -272,156 +252,265 @@ etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE>& msgOut)
 	// [ref] Chen, Jinghu, R.M. Tanner, C. Jones, and Yan Li. "Improved min-sum decoding algorithms for
 	// irregular LDPC codes." In Proceedings. International Symposium on Information Theory, 2005.
 	//-------------------------------------------------------------------------------------------------
-    volatile unsigned int check_node_operation_in_start = 0; 
-    volatile unsigned int check_node_operation_in_end = 0; 
-    unsigned int total_check_node_operation_in = 0;
-    _TCE_RTC(1, check_node_operation_in_start); // OpenASIP 2.0 doc (search for printf explanation)
-
-    volatile const unsigned int* snr_g_id_ptr = SNR_G_ID_PTR;
-    unsigned int snr_g_id = *snr_g_id_ptr;
-    volatile const unsigned int* blk_g_id_ptr = BLK_G_ID_PTR;
-    unsigned int blk_g_id = *blk_g_id_ptr;
-
-    volatile unsigned int timer_declararions_start = 0; 
-    _TCE_RTC(1, timer_declararions_start); // OpenASIP 2.0 doc (search for printf explanation)
-    volatile unsigned int timer_declararions_end = 0; 
-    unsigned int total_timer_declarations = 0;
-
-    volatile unsigned int sim_time = 0;
-
-    volatile unsigned int nEdgesDec_start = 0;
-    volatile unsigned int nEdgesDec_end = 0;
-    unsigned int total_nEdgesDec = 0;
-
-    volatile unsigned int infDec_start = 0;
-    volatile unsigned int infDec_end = 0;
-    unsigned int total_infDec = 0;
-
-    //volatile unsigned int msgOutDec_start = 0;
-    //volatile unsigned int msgOutDec_end = 0;
-    //unsigned int total_msgOutDec = 0;
-
-    volatile unsigned int loop_1_start = 0;
-    volatile unsigned int loop_1_end = 0;
-    unsigned int total_loop_1 = 0;
-
-    volatile unsigned int inDec_start = 0;
-    volatile unsigned int inDec_end = 0;
-    unsigned int total_inDec = 0;
-
-    volatile unsigned int outDec_start = 0;
-    volatile unsigned int outDec_end = 0;
-    unsigned int total_outDec = 0;
-
-    volatile unsigned int in_init_loop_2_start = 0;
-    volatile unsigned int in_init_loop_2_end = 0;
-    unsigned int total_in_init_loop_2 = 0;
-
-    volatile unsigned int out_init_loop_2_start = 0;
-    volatile unsigned int out_init_loop_2_end = 0;
-    unsigned int total_out_init_loop_2 = 0;
-
-    volatile unsigned int oa_check_node_operation_start = 0;
-    volatile unsigned int oa_check_node_operation_end = 0;
-    unsigned int total_oa_check_node_operation = 0;
-
-    volatile unsigned int loop_2_start = 0;
-    volatile unsigned int loop_2_end = 0;
-    unsigned int total_loop_2 = 0;
-    _TCE_RTC(1, timer_declararions_end); // OpenASIP 2.0 doc (search for printf explanation)
-    total_timer_declarations += (timer_declararions_end - timer_declararions_start);
-    //=======================================================
-
-    _TCE_RTC(1, nEdgesDec_start); // OpenASIP 2.0 doc (search for printf explanation)
+ 
     const unsigned nEdges = msgIn.size();
-    _TCE_RTC(1, nEdgesDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-    total_nEdgesDec += (nEdgesDec_end - nEdgesDec_start);
 
-    _TCE_RTC(1, infDec_start); // OpenASIP 2.0 doc (search for printf explanation)
-    const float INF = etl::numeric_limits<float>::infinity();
-    _TCE_RTC(1, infDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-    total_infDec += (infDec_end - infDec_start);
-
-    //_TCE_RTC(1, msgOutDec_start); // OpenASIP 2.0 doc (search for printf explanation)
-    //etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE>
-    //    msgOut(nEdges);
-    //_TCE_RTC(1, msgOutDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-    //total_msgOutDec += (msgOutDec_end - msgOutDec_start);
-
-    _TCE_RTC(1, loop_1_start); // OpenASIP 2.0 doc (search for printf explanation)
     for (unsigned edge = 0; edge < nEdges; ++edge)
         msgOut[edge] = etl::vector<float, MAX_ZC>(mZc, 0.0f);
-    _TCE_RTC(1, loop_1_end); // OpenASIP 2.0 doc (search for printf explanation)
-    total_loop_1 += (loop_1_end - loop_1_start);
+
+#ifdef NRLDPC_USE_DECODER_CUSTOM_FUS
+    // ==========================================================
+    // Custom Function Units accelerated implementation
+    // ==========================================================
+
+    float in[19];
+    float out[19];
+    float min_llr;
+    bool sign_llr;
 
     for (unsigned z = 0; z < mZc; ++z) {
+        for (unsigned edge = 0; edge < 19; ++edge)
+            in[edge] = (edge < nEdges) ? msgIn[edge][z] : 0.0f;
 
-        _TCE_RTC(1, inDec_start); // OpenASIP 2.0 doc (search for printf explanation)
-        float in[19];
-        _TCE_RTC(1, inDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-        total_inDec += (inDec_end - inDec_start);
+        for (unsigned edge = 0; edge < nEdges; ++edge) {
+            switch (nEdges) {
+                case 3:
+                    if (edge == 0) {
+                        _OA_CN_CORE_3(in[1], in[2], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_3(in[0], in[2], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_3(in[0], in[1], min_llr, sign_llr);
+                    }
+                    break;
 
-        _TCE_RTC(1, outDec_start); // OpenASIP 2.0 doc (search for printf explanation)
-        float out[19];
-        _TCE_RTC(1, outDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-        total_outDec += (outDec_end - outDec_start);
+                case 4:
+                    if (edge == 0) {
+                        _OA_CN_CORE_4(in[1], in[2], in[3], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_4(in[0], in[2], in[3], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_4(in[0], in[1], in[3], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_4(in[0], in[1], in[2], min_llr, sign_llr);
+                    }
+                    break;
 
-        for (unsigned edge = 0; edge < 19; ++edge) {
-            _TCE_RTC(1, in_init_loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
-            in[edge] = (edge < nEdges) ? msgIn[edge][z] : INF;
-            _TCE_RTC(1, in_init_loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
-            total_in_init_loop_2 += (in_init_loop_2_end - in_init_loop_2_start);
+                case 5:
+                    if (edge == 0) {
+                        _OA_CN_CORE_5(in[1], in[2], in[3], in[4], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_5(in[0], in[2], in[3], in[4], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_5(in[0], in[1], in[3], in[4], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_5(in[0], in[1], in[2], in[4], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_5(in[0], in[1], in[2], in[3], min_llr, sign_llr);
+                    }
+                    break;
 
-            _TCE_RTC(1, out_init_loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
-            out[edge] = 0.0f;
-            _TCE_RTC(1, out_init_loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
-            total_out_init_loop_2 += (out_init_loop_2_end - out_init_loop_2_start);
+                case 6:
+                    if (edge == 0) {
+                        _OA_CN_CORE_6(in[1], in[2], in[3], in[4], in[5], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_6(in[0], in[2], in[3], in[4], in[5], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_6(in[0], in[1], in[3], in[4], in[5], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_6(in[0], in[1], in[2], in[4], in[5], min_llr, sign_llr);
+                    } else if (edge == 4) {
+                        _OA_CN_CORE_6(in[0], in[1], in[2], in[3], in[5], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_6(in[0], in[1], in[2], in[3], in[4], min_llr, sign_llr);
+                    }
+                    break;
+
+                case 7:
+                    if (edge == 0) {
+                        _OA_CN_CORE_7(in[1], in[2], in[3], in[4], in[5], in[6], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_7(in[0], in[2], in[3], in[4], in[5], in[6], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_7(in[0], in[1], in[3], in[4], in[5], in[6], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_7(in[0], in[1], in[2], in[4], in[5], in[6], min_llr, sign_llr);
+                    } else if (edge == 4) {
+                        _OA_CN_CORE_7(in[0], in[1], in[2], in[3], in[5], in[6], min_llr, sign_llr);
+                    } else if (edge == 5) {
+                        _OA_CN_CORE_7(in[0], in[1], in[2], in[3], in[4], in[6], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_7(in[0], in[1], in[2], in[3], in[4], in[5], min_llr, sign_llr);
+                    }
+                    break;
+
+                case 8:
+                    if (edge == 0) {
+                        _OA_CN_CORE_8(in[1], in[2], in[3], in[4], in[5], in[6], in[7], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_8(in[0], in[2], in[3], in[4], in[5], in[6], in[7], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_8(in[0], in[1], in[3], in[4], in[5], in[6], in[7], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_8(in[0], in[1], in[2], in[4], in[5], in[6], in[7], min_llr, sign_llr);
+                    } else if (edge == 4) {
+                        _OA_CN_CORE_8(in[0], in[1], in[2], in[3], in[5], in[6], in[7], min_llr, sign_llr);
+                    } else if (edge == 5) {
+                        _OA_CN_CORE_8(in[0], in[1], in[2], in[3], in[4], in[6], in[7], min_llr, sign_llr);
+                    } else if (edge == 6) {
+                        _OA_CN_CORE_8(in[0], in[1], in[2], in[3], in[4], in[5], in[7], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_8(in[0], in[1], in[2], in[3], in[4], in[5], in[6], min_llr, sign_llr);
+                    }
+                    break;
+
+                case 9:
+                    if (edge == 0) {
+                        _OA_CN_CORE_9(in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_9(in[0], in[2], in[3], in[4], in[5], in[6], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_9(in[0], in[1], in[3], in[4], in[5], in[6], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_9(in[0], in[1], in[2], in[4], in[5], in[6], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 4) {
+                        _OA_CN_CORE_9(in[0], in[1], in[2], in[3], in[5], in[6], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 5) {
+                        _OA_CN_CORE_9(in[0], in[1], in[2], in[3], in[4], in[6], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 6) {
+                        _OA_CN_CORE_9(in[0], in[1], in[2], in[3], in[4], in[5], in[7], in[8], min_llr, sign_llr);
+                    } else if (edge == 7) {
+                        _OA_CN_CORE_9(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[8], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_9(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], min_llr, sign_llr);
+                    }
+                    break;
+
+                case 10:
+                    if (edge == 0) {
+                        _OA_CN_CORE_10(in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_10(in[0], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_10(in[0], in[1], in[3], in[4], in[5], in[6], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[4], in[5], in[6], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 4) {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[3], in[5], in[6], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 5) {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[3], in[4], in[6], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 6) {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[3], in[4], in[5], in[7], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 7) {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[8], in[9], min_llr, sign_llr);
+                    } else if (edge == 8) {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[9], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_10(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], min_llr, sign_llr);
+                    }
+                    break;
+
+                case 19:
+                    if (edge == 0) {
+                        _OA_CN_CORE_19(in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 1) {
+                        _OA_CN_CORE_19(in[0], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 2) {
+                        _OA_CN_CORE_19(in[0], in[1], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 3) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 4) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 5) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 6) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 7) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 8) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 9) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 10) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[11], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 11) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[12], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 12) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[13], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 13) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[14], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 14) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[15], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 15) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[16], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 16) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[17], in[18], min_llr, sign_llr);
+                    } else if (edge == 17) {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[18], min_llr, sign_llr);
+                    } else {
+                        _OA_CN_CORE_19(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15], in[16], in[17], min_llr, sign_llr);
+                    }
+                    break;
+
+                default:
+                    assert(false && "Unsupported LDPC check-node degree");
+                    min_llr = 0.0f;
+                    sign_llr = false;
+                    break;
+            }
+
+            min_llr = (min_llr > 0.5f) ? min_llr - 0.5f : 0.0f;
+            out[edge] = sign_llr ? -min_llr : min_llr;
         }
 
-        //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-        //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
-        _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-        _OA_CHECK_NODE(
-            in[0],  in[1],  in[2],  in[3],  in[4],
-            in[5],  in[6],  in[7],  in[8],  in[9],
-            in[10], in[11], in[12], in[13], in[14],
-            in[15], in[16], in[17], in[18],
-
-            out[0],  out[1],  out[2],  out[3],  out[4],
-            out[5],  out[6],  out[7],  out[8],  out[9],
-            out[10], out[11], out[12], out[13], out[14],
-            out[15], out[16], out[17], out[18]
-        );
-        _TCE_RTC(1,oa_check_node_operation_end);
-        total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
-        //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-        //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
-        //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
-
-        _TCE_RTC(1, loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
         for (unsigned edge = 0; edge < nEdges; ++edge)
             msgOut[edge][z] = out[edge];
-        _TCE_RTC(1, loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
-        total_loop_2 += (loop_2_end - loop_2_start);
     }
-    _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total timer_declarations elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_timer_declarations/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total nEdgesDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_nEdgesDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total infDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_infDec/1e6);
-    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total msgOutDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_msgOutDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total loop_1 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_loop_1/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total inDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_inDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total outDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_outDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total in_init_loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_in_init_loop_2/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total out_init_loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_out_init_loop_2/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total _OA_CHECK_NODE elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_oa_check_node_operation/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_loop_2/1e6);
+#else
+    // ==========================================================
+    // Generic C++ implementation
+    // ==========================================================
+	unsigned nNodes = msgIn.size();
+    assert(nNodes > 0 && nNodes <= MAX_CHECK_NODE_DEGREE);
 
-    _TCE_RTC(1, check_node_operation_in_end); // OpenASIP 2.0 doc (search for printf explanation)
-    total_check_node_operation_in += (check_node_operation_in_end - check_node_operation_in_start);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total check_node_operation_in elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_check_node_operation_in/1e6);
-    //return msgOut;
+    etl::vector<etl::vector<float, MAX_CHECK_NODE_DEGREE>, MAX_ZC> msgMat = transposeMat(msgIn);
+    etl::vector<size_t,MAX_CHECK_NODE_DEGREE> sortedIdx(nNodes, 0);
+	etl::vector<float,MAX_CHECK_NODE_DEGREE> sign(nNodes, 1.0);
+	float min1, min2, parity;
+	size_t min1Idx, min2Idx;
+
+    for (unsigned i = 0; i < mZc; ++i) {
+        sortedIdx = sort_indexes(msgMat[i]);
+
+        min1Idx = sortedIdx[0];
+        min2Idx = sortedIdx[1];
+
+        min1 = fabs(msgMat[i][min1Idx]);
+        min2 = fabs(msgMat[i][min2Idx]);
+
+        min1 = (min1 > 0.5f) ? min1 - 0.5f : 0.0f;
+        min2 = (min2 > 0.5f) ? min2 - 0.5f : 0.0f;
+
+        etl::vector<float, MAX_CHECK_NODE_DEGREE> outZ(nNodes, min1);
+
+        outZ[min1Idx] = min2;
+
+        parity = 1.0f;
+
+        for (unsigned j = 0; j < nNodes; ++j) {
+            sign[j] = (msgMat[i][j] >= 0.0f) ? 1.0f : -1.0f;
+            parity *= sign[j];
+        }
+
+        for (unsigned j = 0; j < nNodes; ++j) {
+            outZ[j] *= parity * sign[j];
+            msgOut[j][i] = outZ[j];
+        }
+    }
+
+#endif
 }
+
 etl::vector<bool,CODE_WORD_BITS_LENGTH> nrLDPC::rateMatch(const etl::vector<bool,MAX_CODEWORD_LENGTH>& bitsIn, size_t nOfBitOut)
 {
 	if (mBGn == 1)

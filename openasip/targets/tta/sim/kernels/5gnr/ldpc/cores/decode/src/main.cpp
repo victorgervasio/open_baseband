@@ -18,21 +18,21 @@ int main() {
     unsigned int step_time_end = 0;
     
     /*DEBUG*/
-    _TCE_RTC(1, sim_time);
-    printf("[t_sim (decode) [s] = %.6f] DEC_STATUS_PTR = %p\n",sim_time/1e6,
-           (void*)DEC_STATUS_PTR);
+    //_TCE_RTC(1, sim_time);
+    //printf("[t_sim (decode) [s] = %.6f] DEC_STATUS_PTR = %p\n",sim_time/1e6,
+    //       (void*)DEC_STATUS_PTR);
 
-    printf("[t_sim (decode) [s] = %.6f] STARTUP_PTR = %p\n",sim_time/1e6,
-           (void*)STARTUP_PTR);
+    //printf("[t_sim (decode) [s] = %.6f] STARTUP_PTR = %p\n",sim_time/1e6,
+    //       (void*)STARTUP_PTR);
 
-    printf("[t_sim (decode) [s] = %.6f] NRLDPC_ADDR = %p\n",sim_time/1e6,
-           (void*)NRLDPC_ADDR);
+    //printf("[t_sim (decode) [s] = %.6f] NRLDPC_ADDR = %p\n",sim_time/1e6,
+    //       (void*)NRLDPC_ADDR);
 
-    printf("[t_sim (decode) [s] = %.6f] DEC_STATUS initial = %u\n",sim_time/1e6,
-           *DEC_STATUS_PTR);
+    //printf("[t_sim (decode) [s] = %.6f] DEC_STATUS initial = %u\n",sim_time/1e6,
+    //       *DEC_STATUS_PTR);
 
-    printf("[t_sim (decode) [s] = %.6f] STARTUP initial = %u\n",sim_time/1e6,
-           *STARTUP_PTR);
+    //printf("[t_sim (decode) [s] = %.6f] STARTUP initial = %u\n",sim_time/1e6,
+    //       *STARTUP_PTR);
     /*DEBUG*/
     
     while (!*STARTUP_PTR) {}

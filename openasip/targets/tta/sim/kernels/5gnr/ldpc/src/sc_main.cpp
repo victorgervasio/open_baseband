@@ -718,7 +718,7 @@ void example_run_LDPC(
     }
 
     std::printf(
-        "[t_sim [s] = %.6f] "
+        "[t_sim (host) [s] = %.6f] "
         "Began simulated TTA CPU clock time count\n",
         sc_time_stamp().to_seconds());
 
@@ -799,7 +799,7 @@ void example_run_LDPC(
              */
 
             std::printf(
-                "[t_sim [s] = %.6f]"
+                "[t_sim (host) [s] = %.6f]"
                 "[SNR_0%u] "
                 "Started encode_core_prog\n",
                 sc_time_stamp().to_seconds(),
@@ -844,7 +844,7 @@ void example_run_LDPC(
                 0);
 
             //std::printf(
-            //    "[t_sim (host) [s] = %.6f]"
+            //    "[t_sim (host) (host) [s] = %.6f]"
             //    "[SNR_0%u] "
             //    "Host requested encode: "
             //    "ENC_STATUS=%u "
@@ -898,14 +898,14 @@ void example_run_LDPC(
                 sc_time_stamp();
 
             std::printf(
-                "[t_sim [s] = %.6f]"
+                "[t_sim (host) [s] = %.6f]"
                 "[SNR_0%u] "
                 "Ended encode_core_prog\n",
                 sc_time_stamp().to_seconds(),
                 i);
 
             std::printf(
-                "[t_sim [s] = %.6f]"
+                "[t_sim (host) [s] = %.6f]"
                 "[SNR_0%u] "
                 "encode elapsed time [s]: %.6f\n",
                 sc_time_stamp().to_seconds(),
@@ -965,7 +965,7 @@ void example_run_LDPC(
              */
 
             std::printf(
-                "[t_sim [s] = %.6f]"
+                "[t_sim (host) [s] = %.6f]"
                 "[SNR_0%u] "
                 "Started decode\n",
                 sc_time_stamp().to_seconds(),
@@ -1045,14 +1045,14 @@ void example_run_LDPC(
                 sc_time_stamp();
 
             std::printf(
-                "[t_sim [s] = %.6f]"
+                "[t_sim (host) [s] = %.6f]"
                 "[SNR_0%u] "
                 "Ended decode\n",
                 sc_time_stamp().to_seconds(),
                 i);
 
             std::printf(
-                "[t_sim [s] = %.6f]"
+                "[t_sim (host) [s] = %.6f]"
                 "[SNR_0%u] "
                 "decode elapsed time [s]: %.6f\n",
                 sc_time_stamp().to_seconds(),
@@ -1519,12 +1519,12 @@ int sc_main(
     encoder_tta.setOperationSimulator(
         "lsu",
         lsu1);
-    encoder_tta.setOperationSimulator(
-        "lsu_1",
-        lsu1);
-    encoder_tta.setOperationSimulator(
-        "lsu_1_1",
-        lsu1);
+    //encoder_tta.setOperationSimulator(
+    //    "lsu_1",
+    //    lsu1);
+    //encoder_tta.setOperationSimulator(
+    //    "lsu_1_1",
+    //    lsu1);
 
     /*
      * Application-specific connection to our shared memory.
@@ -1565,12 +1565,12 @@ int sc_main(
     decoder_tta.setOperationSimulator(
         "lsu",
         lsu2);
-    decoder_tta.setOperationSimulator(
-        "lsu_1",
-        lsu2);
-    decoder_tta.setOperationSimulator(
-        "lsu_1_1",
-        lsu2);
+    //decoder_tta.setOperationSimulator(
+    //    "lsu_1",
+    //    lsu2);
+    //decoder_tta.setOperationSimulator(
+    //    "lsu_1_1",
+    //    lsu2);
 
     /*
      * Both LSU models point to the SAME shared-memory object.
