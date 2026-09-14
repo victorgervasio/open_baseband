@@ -21,7 +21,7 @@ constexpr int MESSAGE_BITS_LENGTH = MESSAGE_LENGTH * 8; //120
 //#endif
 #ifndef CODE_WORD_BITS_LENGTH
 //#define CODE_WORD_BITS_LENGTH 9000 // change until bler starts falling
-#define CODE_WORD_BITS_LENGTH 8000 // change until bler starts falling
+#define CODE_WORD_BITS_LENGTH 12000 // change until bler starts falling
 #endif
 
 #ifndef CODE_RATE_NUM
@@ -45,7 +45,7 @@ constexpr int INFO_LENGTH = INFO_BITS_LENGTH / 8; //41
 #endif
 
 #ifndef N_MAX_ITER
-#define N_MAX_ITER 8 //number of decoders
+#define N_MAX_ITER 600 //number of decoders
 #endif
 
 #ifndef N_MAX_BLKS

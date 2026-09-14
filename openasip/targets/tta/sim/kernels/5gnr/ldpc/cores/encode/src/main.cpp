@@ -137,12 +137,13 @@ int main() {
         // This will write directly into RM_ENC_PTR because rm_enc is a reference
         encode_blk(extMsg, rm_enc);
         for (size_t i = 0; i < rm_enc.size(); ++i) rmEnc_raw[i] = rm_enc[i] ? 1 : 0;
-        *ENC_STATUS_PTR = 1; // Instantly notify Top-Level that writing is completed
 
         _TCE_RTC(1, step_time_end); // OpenASIP 2.0 doc (search for printf explanation)
         _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
         printf("[t_sim (encode) [s] = %.6f][SNR_0%i] Ended encode_blk\n",sim_time/1e6,snr_g_id);
         printf("[t_sim (encode) [s] = %.6f][SNR_0%i] encode_blk elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,(step_time_end - step_time_start)/1e6);
+
+        *ENC_STATUS_PTR = 1; // Instantly notify Top-Level that writing is completed
     } while(1);
 	return 0;
 }

@@ -94,6 +94,247 @@
 //END_TRIGGER;
 //END_OPERATION(CHECK_NODE)
 
+OPERATION(CHECK_NODE_4)
+TRIGGER
+const unsigned DEGREE = 4;
+
+float in_llr[DEGREE - 1];
+
+bool found_llr_to_skip;
+for (unsigned i = 0; i < DEGREE; ++i) {
+
+    found_llr_to_skip = false;
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        if (i != j && !found_llr_to_skip)
+            in_llr[j] = FLT(1 + j);
+        else {
+            in_llr[j] = FLT(2 + j);
+            found_llr_to_skip = true;
+        }
+    }
+
+    float min = 3.402823466e+38F;
+    float parity = 1.0f;
+
+    /*
+     * Find:
+     *
+     *   min       = smallest magnitude
+     *   parity     = product of all signs
+     */
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        float absMsg = (in_llr[j] >= 0.0f) ? in_llr[j] : -in_llr[j];
+        if (absMsg < min)
+            min = absMsg;
+
+        if (in_llr[j] < 0.0f)
+            parity = -parity;
+    }
+
+    /*
+     * Generate extrinsic outputs.
+     */
+    IO(i + 1 + DEGREE) = min * parity;
+}
+
+return true;
+
+END_TRIGGER;
+END_OPERATION(CHECK_NODE_4)
+
+OPERATION(CHECK_NODE_5)
+TRIGGER
+const unsigned DEGREE = 5;
+
+float in_llr[DEGREE - 1];
+
+bool found_llr_to_skip;
+for (unsigned i = 0; i < DEGREE; ++i) {
+
+    found_llr_to_skip = false;
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        if (i != j && !found_llr_to_skip)
+            in_llr[j] = FLT(1 + j);
+        else {
+            in_llr[j] = FLT(2 + j);
+            found_llr_to_skip = true;
+        }
+    }
+
+    float min = 3.402823466e+38F;
+    float parity = 1.0f;
+
+    /*
+     * Find:
+     *
+     *   min       = smallest magnitude
+     *   parity     = product of all signs
+     */
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        float absMsg = (in_llr[j] >= 0.0f) ? in_llr[j] : -in_llr[j];
+        if (absMsg < min)
+            min = absMsg;
+
+        if (in_llr[j] < 0.0f)
+            parity = -parity;
+    }
+
+    /*
+     * Generate extrinsic outputs.
+     */
+    IO(i + 1 + DEGREE) = min * parity;
+}
+
+return true;
+
+END_TRIGGER;
+END_OPERATION(CHECK_NODE_5)
+
+OPERATION(CHECK_NODE_6)
+TRIGGER
+const unsigned DEGREE = 6;
+
+float in_llr[DEGREE - 1];
+
+bool found_llr_to_skip;
+for (unsigned i = 0; i < DEGREE; ++i) {
+
+    found_llr_to_skip = false;
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        if (i != j && !found_llr_to_skip)
+            in_llr[j] = FLT(1 + j);
+        else {
+            in_llr[j] = FLT(2 + j);
+            found_llr_to_skip = true;
+        }
+    }
+
+    float min = 3.402823466e+38F;
+    float parity = 1.0f;
+
+    /*
+     * Find:
+     *
+     *   min       = smallest magnitude
+     *   parity     = product of all signs
+     */
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        float absMsg = (in_llr[j] >= 0.0f) ? in_llr[j] : -in_llr[j];
+        if (absMsg < min)
+            min = absMsg;
+
+        if (in_llr[j] < 0.0f)
+            parity = -parity;
+    }
+
+    /*
+     * Generate extrinsic outputs.
+     */
+    IO(i + 1 + DEGREE) = min * parity;
+}
+
+return true;
+
+END_TRIGGER;
+END_OPERATION(CHECK_NODE_6)
+
+OPERATION(CHECK_NODE_7)
+TRIGGER
+const unsigned DEGREE = 7;
+
+float in_llr[DEGREE - 1];
+
+bool found_llr_to_skip;
+for (unsigned i = 0; i < DEGREE; ++i) {
+
+    found_llr_to_skip = false;
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        if (i != j && !found_llr_to_skip)
+            in_llr[j] = FLT(1 + j);
+        else {
+            in_llr[j] = FLT(2 + j);
+            found_llr_to_skip = true;
+        }
+    }
+
+    float min = 3.402823466e+38F;
+    float parity = 1.0f;
+
+    /*
+     * Find:
+     *
+     *   min       = smallest magnitude
+     *   parity     = product of all signs
+     */
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        float absMsg = (in_llr[j] >= 0.0f) ? in_llr[j] : -in_llr[j];
+        if (absMsg < min)
+            min = absMsg;
+
+        if (in_llr[j] < 0.0f)
+            parity = -parity;
+    }
+
+    /*
+     * Generate extrinsic outputs.
+     */
+    IO(i + 1 + DEGREE) = min * parity;
+}
+
+return true;
+
+END_TRIGGER;
+END_OPERATION(CHECK_NODE_7)
+
+OPERATION(CHECK_NODE_19)
+TRIGGER
+const unsigned DEGREE = 19;
+
+float in_llr[DEGREE - 1];
+
+bool found_llr_to_skip;
+for (unsigned i = 0; i < DEGREE; ++i) {
+
+    found_llr_to_skip = false;
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        if (i != j && !found_llr_to_skip)
+            in_llr[j] = FLT(1 + j);
+        else {
+            in_llr[j] = FLT(2 + j);
+            found_llr_to_skip = true;
+        }
+    }
+
+    float min = 3.402823466e+38F;
+    float parity = 1.0f;
+
+    /*
+     * Find:
+     *
+     *   min       = smallest magnitude
+     *   parity     = product of all signs
+     */
+    for (unsigned j = 0; j < (DEGREE - 1); ++j) {
+        float absMsg = (in_llr[j] >= 0.0f) ? in_llr[j] : -in_llr[j];
+        if (absMsg < min)
+            min = absMsg;
+
+        if (in_llr[j] < 0.0f)
+            parity = -parity;
+    }
+
+    /*
+     * Generate extrinsic outputs.
+     */
+    IO(i + 1 + DEGREE) = min * parity;
+}
+
+return true;
+
+END_TRIGGER;
+END_OPERATION(CHECK_NODE_19)
+
+
 OPERATION(CN_CORE_3)
 TRIGGER
 unsigned DEGREE = 3;

@@ -44,6 +44,12 @@ GIT ?= git
 CMAKE_BUILD_TYPE ?= Release # RelWithDebInfo for getting debug symbols
 WORKTREE_ROOT ?= $(ROOT_DIR)/.worktrees
 
+NPROCS := $(shell nproc)
+NPAR := $(shell expr $(NPROCS) - 1)
+ifeq ($(NPAR),0)
+    NPAR := 1
+endif
+
 .PHONY: all build configure ensure-etl ensure-sim-venv
 .PHONY: build-tta build-x86_64 build-almaif
 .PHONY: build-tta-sim build-tta-asic
@@ -71,12 +77,12 @@ endef
 all: OPENASIP_TARGET=all
 all: configure 
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target all
+	$(CMAKE) --build "$(BUILD_DIR)" --target all -j$(NPAR) -- --output-sync=line
 
 build: OPENASIP_TARGET=all
 build: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build
+	$(CMAKE) --build "$(BUILD_DIR)" --target build -j$(NPAR) -- --output-sync=line
 
 configure: ensure-etl ensure-sim-venv
 	$(SOURCE_TCE)
@@ -90,7 +96,10 @@ configure: ensure-etl ensure-sim-venv
 		-DRTL_HDL="$(RTL_HDL)" \
 		-DSIM_OUTPUT_DIR="$(SIM_OUTPUT_DIR)" \
 		-DDATASET_LOG_DIR="$(DATASET_LOG_DIR)" \
-		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)"
+		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)" \
+        -DCMAKE_C_FLAGS="-fdiagnostics-color=always" \
+        -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always" \
+        -DCMAKE_COLOR_DIAGNOSTICS=ON
 
 # Clone and build/install ETL locally.  CMake configuration of open_baseband
 # depends on this target so `make`, `make all`, and every build-* target are
@@ -119,7 +128,7 @@ ensure-etl:
 		$(CMAKE) -S "$(ETL_ROOT)" -B "$(ETL_BUILD_DIR)" \
 			-DCMAKE_INSTALL_PREFIX="$(ETL_INSTALL_DIR)"
 		echo "==> Building/installing ETL"
-		$(CMAKE) --build "$(ETL_BUILD_DIR)" --parallel --target install
+		$(CMAKE) --build "$(ETL_BUILD_DIR)" --target install -j$(NPAR) -- --output-sync=line
 		mkdir -p "$(ETL_INSTALL_DIR)"
 		touch "$(ETL_INSTALL_DIR)/.open_baseband_etl_installed"
 	else
@@ -152,107 +161,108 @@ ensure-sim-venv:
 build-tta: OPENASIP_TARGET=tta
 build-tta: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-tta
+	#$(CMAKE) --build "$(BUILD_DIR)" --target build-tta -j$(NPAR) -- --output-sync=line
+	$(CMAKE) --build "$(BUILD_DIR)" --target build-tta
 
 build-tta-sim: OPENASIP_TARGET=tta
 build-tta-sim: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-tta-sim
+	$(CMAKE) --build "$(BUILD_DIR)" --target build-tta-sim -j$(NPAR) -- --output-sync=line
 
 build-tta-asic: OPENASIP_TARGET=tta
 build-tta-asic: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-tta-asic
+	$(CMAKE) --build "$(BUILD_DIR)" --target build-tta-asic -j$(NPAR) -- --output-sync=line
 
 build-x86_64: OPENASIP_TARGET=x86_64
 build-x86_64: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-x86_64
+	$(CMAKE) --build "$(BUILD_DIR)" --target build-x86_64 -j$(NPAR) -- --output-sync=line
 
 build-almaif: OPENASIP_TARGET=almaif
 build-almaif: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target build-almaif
+	$(CMAKE) --build "$(BUILD_DIR)" --target build-almaif -j$(NPAR) -- --output-sync=line
 
 tta: OPENASIP_TARGET=tta
 tta: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target tta
+	$(CMAKE) --build "$(BUILD_DIR)" --target tta -j$(NPAR) -- --output-sync=line
 
 x86_64: OPENASIP_TARGET=x86_64
 x86_64: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target x86_64
+	$(CMAKE) --build "$(BUILD_DIR)" --target x86_64 -j$(NPAR) -- --output-sync=line
 
 almaif: OPENASIP_TARGET=almaif
 almaif: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target almaif
+	$(CMAKE) --build "$(BUILD_DIR)" --target almaif -j$(NPAR) -- --output-sync=line
 
 simulate: OPENASIP_TARGET=all
 simulate: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target simulate
+	$(CMAKE) --build "$(BUILD_DIR)" --target simulate -j$(NPAR) -- --output-sync=line
 
 simulate-tta: OPENASIP_TARGET=tta
 simulate-tta: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target simulate-tta
+	$(CMAKE) --build "$(BUILD_DIR)" --target simulate-tta -j$(NPAR) -- --output-sync=line
 
 simulate-x86_64: OPENASIP_TARGET=x86_64
 simulate-x86_64: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target simulate-x86_64
+	$(CMAKE) --build "$(BUILD_DIR)" --target simulate-x86_64 -j$(NPAR) -- --output-sync=line
 
 simulate-almaif: OPENASIP_TARGET=almaif
 simulate-almaif: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target simulate-almaif
+	$(CMAKE) --build "$(BUILD_DIR)" --target simulate-almaif -j$(NPAR) -- --output-sync=line
 
 verilog-rtl: OPENASIP_TARGET=tta
 verilog-rtl: RTL_HDL=verilog
 verilog-rtl: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target verilog-rtl
+	$(CMAKE) --build "$(BUILD_DIR)" --target verilog-rtl -j$(NPAR) -- --output-sync=line
 
 vhdl-rtl: OPENASIP_TARGET=tta
 vhdl-rtl: RTL_HDL=vhdl
 vhdl-rtl: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target vhdl-rtl
+	$(CMAKE) --build "$(BUILD_DIR)" --target vhdl-rtl -j$(NPAR) -- --output-sync=line
 
 dataset-tta: OPENASIP_TARGET=tta
 dataset-tta: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-tta
+	$(CMAKE) --build "$(BUILD_DIR)" --target dataset-tta -j$(NPAR) -- --output-sync=line
 
 dataset-x86_64: OPENASIP_TARGET=x86_64
 dataset-x86_64: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-x86_64
+	$(CMAKE) --build "$(BUILD_DIR)" --target dataset-x86_64 -j$(NPAR) -- --output-sync=line
 
 dataset-almaif: OPENASIP_TARGET=almaif
 dataset-almaif: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset-almaif
+	$(CMAKE) --build "$(BUILD_DIR)" --target dataset-almaif -j$(NPAR) -- --output-sync=line
 
 build: BUILD_DIR=$(BUILD_ROOT)/all
 build: OPENASIP_TARGET=all
 dataset: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target dataset
+	$(CMAKE) --build "$(BUILD_DIR)" --target dataset -j$(NPAR) -- --output-sync=line
 
 analyze: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --parallel --target analyze
+	$(CMAKE) --build "$(BUILD_DIR)" --target analyze -j$(NPAR) -- --output-sync=line
 
 format: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --target format
+	$(CMAKE) --build "$(BUILD_DIR)" --target format -j$(NPAR) -- --output-sync=line
 
 lint: configure
 	$(SOURCE_TCE)
-	$(CMAKE) --build "$(BUILD_DIR)" --target lint
+	$(CMAKE) --build "$(BUILD_DIR)" --target lint -j$(NPAR) -- --output-sync=line
 
 worktree:
 	@if [[ -z "$(branch)" ]]; then \
@@ -293,7 +303,7 @@ clean:
 	$(SOURCE_TCE)
 	for dir in "$(BUILD_ROOT)"/*; do
 		if [[ -d "$$dir" ]]; then
-			$(CMAKE) --build "$$dir" --target clean
+			$(CMAKE) --build "$$dir" --target clean -j$(NPAR) -- --output-sync=line
 		fi
 	done
 

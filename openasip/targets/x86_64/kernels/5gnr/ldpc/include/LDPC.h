@@ -66,7 +66,7 @@ public:
 	// encoding
 	std::vector<bool> encode(const std::vector<bool>& msg);
 	// decoding
-	std::vector<bool> decode(const std::vector<float>& llr, const unsigned nMaxIter);
+    std::vector<bool> decode(const std::vector<float>& softBitsIn, const unsigned nMaxIter);
 	// rate matching
 	std::vector<bool> rateMatch(const std::vector<bool>& bitsIn, std::size_t nOfBitOut);
 	// rate recovery
@@ -84,7 +84,7 @@ public:
 
 private:
 	// core decoding module
-	std::vector<std::vector<float>> checkNodeOperation(const std::vector<std::vector<float>>& msgIn);
+    void checkNodeOperation(const std::vector<std::vector<float>>& VtoCMsg, std::vector<std::vector<float>>& msgOut);
 	template<typename T>
 	inline std::vector<std::size_t> sort_indexes(const std::vector<T>& v);
 	std::vector<std::vector<float>> transposeMat(const std::vector<std::vector<float>>& mat);

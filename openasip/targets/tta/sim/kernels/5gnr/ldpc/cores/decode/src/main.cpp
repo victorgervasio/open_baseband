@@ -63,12 +63,13 @@ int main() {
         // This will write directly into MSG_CAP_PTR because msg_cap is a reference
         decode_blk(llr, msg_cap); 
         for (size_t i = 0; i < msg_cap.size(); ++i) msgCap_raw[i] = msg_cap[i] ? 1 : 0;
-        *DEC_STATUS_PTR = 1; // Instantly notify Top-Level that writing is completed
 
         _TCE_RTC(1, step_time_end); 
         _TCE_RTC(1, sim_time); 
         printf("[t_sim [s] = %.6f][SNR_0%u] Ended decode_blk\n", sim_time / 1e6, snr_g_id);
         printf("[t_sim [s] = %.6f][SNR_0%u] decode_blk elapsed time [s]: %.6f\n", sim_time / 1e6, snr_g_id, (step_time_end - step_time_start) / 1e6);
+
+        *DEC_STATUS_PTR = 1; // Instantly notify Top-Level that writing is completed
     } while(1);
     return 0;
 }
