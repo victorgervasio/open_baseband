@@ -154,124 +154,99 @@ etl::vector<bool, MAX_INFO_NODE_BITS> nrLDPC::decode(const etl::vector<float, MA
     volatile const unsigned int* blk_g_id_ptr = BLK_G_ID_PTR;
     unsigned int blk_g_id = *blk_g_id_ptr;
 
-    //printf("\noi1\n");
 	assert(softBitsIn.size() == mN);
-    //printf("\noi2\n");
 
 	// initialize LLR in blocks(nodes), each node with Zc bits
     etl::vector<etl::vector<float, MAX_ZC>, MAX_CB> LLR(mN / mZc);
-    //printf("\noi3\n");
 	for (unsigned i = 0; i < mN / mZc; i++) {
-        //printf("\noi4 [%i/%i]\n",i,static_cast<int>(mN/mZc));
 		LLR[i] = etl::vector<float, MAX_ZC>(softBitsIn.begin() + i * mZc, softBitsIn.begin() + (i + 1) * mZc);
 	}
 
 	// find how many parity nodes to use for decoding
 	unsigned nMaxLayer;
-    //printf("\noi5\n");
 	if (mBGn == 1) {
 		// assume tx bits length =  ceil(kBar/R), alternatively can use all layers(slower)
-		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 20;
         nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 20;
-        //printf("\noi6\n");
-        //DEBUG
-        //nMaxLayer = mLayers.size();
-        //DEBUG
     } else {
-		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 8;
         nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 8;
-        //printf("\noi7\n");
-        //DEBUG
-        //nMaxLayer = mLayers.size();
-        //DEBUG
 	}
 
 	// initialize msg from check nodes to vector nodes, each edge correspond a message
     etl::vector<etl::vector<float, MAX_ZC>, MAX_EDGES> CtoVMsg(mEdges.size());
-    //printf("\noi8\n");
-    int my_iter = 0;
 	for (auto& e : CtoVMsg) {
-        //printf("\noi9 [%i/%i]\n",my_iter,static_cast<unsigned int>(CtoVMsg.size())-1);
-        my_iter++;
 		e = etl::vector<float,MAX_ZC>(mZc, 0);
 	}
 	// llr updates
 	unsigned nLayerEdges, edgeIdx, nShifts, vNodeIdx;
-    //printf("\noi10\n");
+    etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE> VtoCMsg;
+    etl::vector<etl::vector<float,MAX_ZC>,MAX_CHECK_NODE_DEGREE> minSumMsgs;
+    etl::vector<bool, MAX_CODEWORD_LENGTH> hardCodeword;
 	for (unsigned iIter = 0; iIter < nMaxIter; iIter++) {
 		for (unsigned iLayer = 0; iLayer < nMaxLayer; iLayer++) {
-            //printf("\noi11 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 			nLayerEdges = mLayers[iLayer].edgeEnd - mLayers[iLayer].edgeStart;
-            //printf("\noi12 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 			// messages from variable nodes to check node
-            etl::vector<etl::vector<float, MAX_ZC>, MAX_CHECK_NODE_DEGREE> VtoCMsg(nLayerEdges);
-            //printf("\noi13 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
-            my_iter = 0;
+            VtoCMsg.resize(static_cast<size_t>(nLayerEdges));
 			for (auto& e : VtoCMsg) {
-                //printf("\noi14 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,my_iter,static_cast<unsigned int>(VtoCMsg.size())-1);
-                my_iter++;
-				e = etl::vector<float,MAX_ZC>(mZc, 0);
+				e.resize(mZc);
 			}
 			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
-                //printf("\noi15 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
-                //printf("\noi16 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
-                //printf("\noi17 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				LLR[vNodeIdx] = eleWiseMinus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
-                //printf("\noi18 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				VtoCMsg[iEdge] = LLR[vNodeIdx];
-                //printf("\noi19 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				VtoCMsg[iEdge] = circShift(VtoCMsg[iEdge], nShifts);
 			}
 			//check node operation
             _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
             _TCE_RTC(1, check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-            etl::vector<etl::vector<float,MAX_ZC>,MAX_CHECK_NODE_DEGREE> minSumMsgs(MAX_CHECK_NODE_DEGREE); 
+            minSumMsgs.resize(nLayerEdges);
             for (auto& e : minSumMsgs)
-                e = etl::vector<float,MAX_ZC>(mZc,0.0f); // avoid out-of-bounds read access error
+                e.resize(mZc);
             checkNodeOperation(VtoCMsg, minSumMsgs);
             _TCE_RTC(1,check_node_operation_end);
             _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
             printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
-            //printf("\noi20 [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1);
 
 			//message from check node to varible nodes
 			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
-                //printf("\noi21 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
-                //printf("\noi22 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
-                //printf("\noi23 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				CtoVMsg[edgeIdx] = circShift(minSumMsgs[iEdge], mZc - nShifts);
-                //printf("\noi24 [%i/%i] [%i/%i]\n",iLayer + iIter*iLayer,nMaxIter*nMaxLayer-1,iEdge,nLayerEdges-1);
 				LLR[vNodeIdx] = eleWisePlus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
 			}
 		}
+
+        // Check convergence after a complete iteration.
+        hardCodeword.resize(mN);
+
+        unsigned bitIdx = 0;
+        for (unsigned iNode = 0; iNode < LLR.size(); ++iNode) {
+            for (unsigned i = 0; i < mZc; ++i) {
+                hardCodeword[bitIdx++] = (LLR[iNode][i] <= 0.0f);
+            }
+        }
+
+        if (checkSumCodeWord(hardCodeword)) {
+            _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
+            printf(
+                "[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i] decode converged at iteration %u\n",
+                sim_time/1e6,snr_g_id,blk_g_id,iIter,iIter + 1);
+            break;
+        }
 	}
 	// flatten the 2-D vector LLR
     etl::vector<float, MAX_CODEWORD_LENGTH> vecLLR;
-    //printf("\noi25\n");
-    my_iter = 0;
 	for (auto e : LLR) {
-        //printf("\noi25 [%i/%i]\n",my_iter,static_cast<unsigned int>(LLR.size())-1);
-        my_iter++;
 		vecLLR.insert(vecLLR.end(), e.begin(), e.end());
 	}
-	//vecLLR.erase(vecLLR.end() - mF, vecLLR.end());
 
 	// chose information bits
     etl::vector<bool, MAX_INFO_NODE_BITS> decBits(mKBar, false);
-    //printf("\noi26\n");
-    my_iter = 0;
 	for (unsigned i = 0; i < mKBar; i++) {
-        //printf("\noi27 [%i/%i]\n",my_iter,static_cast<unsigned int>(mKBar)-1);
-        my_iter++;
 		decBits[i] = (vecLLR[i] <= 0);
 	}
-
 	return decBits;
 }
 
@@ -314,33 +289,33 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
     //volatile unsigned int msgOutDec_end = 0;
     //unsigned int total_msgOutDec = 0;
 
-    volatile unsigned int loop_1_start = 0;
-    volatile unsigned int loop_1_end = 0;
-    unsigned int total_loop_1 = 0;
+    //volatile unsigned int loop_1_start = 0;
+    //volatile unsigned int loop_1_end = 0;
+    //unsigned int total_loop_1 = 0;
 
-    volatile unsigned int inDec_start = 0;
-    volatile unsigned int inDec_end = 0;
-    unsigned int total_inDec = 0;
+    //volatile unsigned int inDec_start = 0;
+    //volatile unsigned int inDec_end = 0;
+    //unsigned int total_inDec = 0;
 
-    volatile unsigned int outDec_start = 0;
-    volatile unsigned int outDec_end = 0;
-    unsigned int total_outDec = 0;
+    volatile unsigned int discardDec_start = 0;
+    volatile unsigned int discardDec_end = 0;
+    unsigned int total_discardDec = 0;
 
-    volatile unsigned int in_init_loop_2_start = 0;
-    volatile unsigned int in_init_loop_2_end = 0;
-    unsigned int total_in_init_loop_2 = 0;
+    //volatile unsigned int in_init_loop_2_start = 0;
+    //volatile unsigned int in_init_loop_2_end = 0;
+    //unsigned int total_in_init_loop_2 = 0;
 
-    volatile unsigned int out_init_loop_2_start = 0;
-    volatile unsigned int out_init_loop_2_end = 0;
-    unsigned int total_out_init_loop_2 = 0;
+    //volatile unsigned int out_init_loop_2_start = 0;
+    //volatile unsigned int out_init_loop_2_end = 0;
+    //unsigned int total_out_init_loop_2 = 0;
 
     volatile unsigned int oa_check_node_operation_start = 0;
     volatile unsigned int oa_check_node_operation_end = 0;
     unsigned int total_oa_check_node_operation = 0;
 
-    volatile unsigned int loop_2_start = 0;
-    volatile unsigned int loop_2_end = 0;
-    unsigned int total_loop_2 = 0;
+    //volatile unsigned int loop_2_start = 0;
+    //volatile unsigned int loop_2_end = 0;
+    //unsigned int total_loop_2 = 0;
     _TCE_RTC(1, timer_declararions_end); // OpenASIP 2.0 doc (search for printf explanation)
     total_timer_declarations += (timer_declararions_end - timer_declararions_start);
     //=======================================================
@@ -361,74 +336,263 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
     //_TCE_RTC(1, msgOutDec_end); // OpenASIP 2.0 doc (search for printf explanation)
     //total_msgOutDec += (msgOutDec_end - msgOutDec_start);
 
-    _TCE_RTC(1, loop_1_start); // OpenASIP 2.0 doc (search for printf explanation)
-    for (unsigned edge = 0; edge < nEdges; ++edge)
-        msgOut[edge] = etl::vector<float, MAX_ZC>(mZc, 0.0f);
-    _TCE_RTC(1, loop_1_end); // OpenASIP 2.0 doc (search for printf explanation)
-    total_loop_1 += (loop_1_end - loop_1_start);
+    //_TCE_RTC(1, loop_1_start); // OpenASIP 2.0 doc (search for printf explanation)
+    //for (unsigned edge = 0; edge < nEdges; ++edge)
+    //    msgOut[edge] = etl::vector<float, MAX_ZC>(mZc, 0.0f);
+    //_TCE_RTC(1, loop_1_end); // OpenASIP 2.0 doc (search for printf explanation)
+    //total_loop_1 += (loop_1_end - loop_1_start);
+    
+    _TCE_RTC(1, discardDec_start); // OpenASIP 2.0 doc (search for printf explanation)
+    float discard[16]; // max. usage for nEdges = 3
+    _TCE_RTC(1, discardDec_end); // OpenASIP 2.0 doc (search for printf explanation)
+    total_discardDec += (discardDec_end - discardDec_start);
 
-    for (unsigned z = 0; z < mZc; ++z) {
 
-        _TCE_RTC(1, inDec_start); // OpenASIP 2.0 doc (search for printf explanation)
-        float in[19];
-        _TCE_RTC(1, inDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-        total_inDec += (inDec_end - inDec_start);
+    //_TCE_RTC(1, inDec_start); // OpenASIP 2.0 doc (search for printf explanation)
+    //float in[19];
+    //_TCE_RTC(1, inDec_end); // OpenASIP 2.0 doc (search for printf explanation)
+    //total_inDec += (inDec_end - inDec_start);
 
-        _TCE_RTC(1, outDec_start); // OpenASIP 2.0 doc (search for printf explanation)
-        float out[19];
-        _TCE_RTC(1, outDec_end); // OpenASIP 2.0 doc (search for printf explanation)
-        total_outDec += (outDec_end - outDec_start);
+    //for (unsigned edge = 0; edge < 19; ++edge) {
+    //    _TCE_RTC(1, in_init_loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
+    //    in[edge] = (edge < nEdges) ? msgIn[edge][z] : INF;
+    //    _TCE_RTC(1, in_init_loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
+    //    total_in_init_loop_2 += (in_init_loop_2_end - in_init_loop_2_start);
 
-        for (unsigned edge = 0; edge < 19; ++edge) {
-            _TCE_RTC(1, in_init_loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
-            in[edge] = (edge < nEdges) ? msgIn[edge][z] : INF;
-            _TCE_RTC(1, in_init_loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
-            total_in_init_loop_2 += (in_init_loop_2_end - in_init_loop_2_start);
+    //    _TCE_RTC(1, out_init_loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
+    //    out[edge] = 0.0f;
+    //    _TCE_RTC(1, out_init_loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
+    //    total_out_init_loop_2 += (out_init_loop_2_end - out_init_loop_2_start);
+    //}
 
-            _TCE_RTC(1, out_init_loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
-            out[edge] = 0.0f;
-            _TCE_RTC(1, out_init_loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
-            total_out_init_loop_2 += (out_init_loop_2_end - out_init_loop_2_start);
-        }
+    //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
+    switch (nEdges) {
 
-        //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-        //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
-        _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-        _OA_CHECK_NODE_19(
-            in[0],  in[1],  in[2],  in[3],  in[4],
-            in[5],  in[6],  in[7],  in[8],  in[9],
-            in[10], in[11], in[12], in[13], in[14],
-            in[15], in[16], in[17], in[18],
+        case 3:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], INF, INF,
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF,
 
-            out[0],  out[1],  out[2],  out[3],  out[4],
-            out[5],  out[6],  out[7],  out[8],  out[9],
-            out[10], out[11], out[12], out[13], out[14],
-            out[15], out[16], out[17], out[18]
-        );
-        _TCE_RTC(1,oa_check_node_operation_end);
-        total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
-        //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
-        //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
-        //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10], discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
 
-        _TCE_RTC(1, loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
-        for (unsigned edge = 0; edge < nEdges; ++edge)
-            msgOut[edge][z] = out[edge];
-        _TCE_RTC(1, loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
-        total_loop_2 += (loop_2_end - loop_2_start);
+        case 4:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], INF,
+                    INF        , INF        , INF        , INF        , INF,
+                    INF        , INF        , INF        , INF        , INF,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10]  , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 5:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                    INF        , INF        , INF        , INF, INF   ,
+                    INF        , INF        , INF        , INF, INF   ,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 6:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                    msgIn[5][z], INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 7:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                    msgIn[5][z], msgIn[6][z], INF        , INF, INF,
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 8:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                    msgIn[5][z], msgIn[6][z], msgIn[7][z], INF, INF,
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 9:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                    msgIn[5][z], msgIn[6][z], msgIn[7][z], msgIn[8][z], INF,
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 10:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                    msgIn[5][z], msgIn[6][z], msgIn[7][z], msgIn[8][z], msgIn[9][z],
+                    INF        , INF        , INF        , INF, INF,
+                    INF        , INF        , INF        , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+        case 19:
+            _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+            for (unsigned z = 0; z < mZc; ++z) {
+                //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                _OA_CHECK_NODE_19(
+                    msgIn[0][z] , msgIn[1][z] , msgIn[2][z] , msgIn[3][z] , msgIn[4][z] ,
+                    msgIn[5][z] , msgIn[6][z] , msgIn[7][z] , msgIn[8][z] , msgIn[9][z] ,
+                    msgIn[10][z], msgIn[11][z], msgIn[12][z], msgIn[13][z], msgIn[14][z],
+                    msgIn[15][z], msgIn[16][z], msgIn[17][z], msgIn[18][z],
+
+                    msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
+                    msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
+                    msgOut[10][z], msgOut[11][z], msgOut[12][z], msgOut[13][z], msgOut[14][z],
+                    msgOut[15][z], msgOut[16][z], msgOut[17][z], msgOut[18][z]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            }
+            break;
+            _TCE_RTC(1,oa_check_node_operation_end);
+            total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+        
+        default:
+            printf("Invalid nEdges: %i\n",nEdges);
+    
     }
+
+    //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Ended checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] checkNodeOperation elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer,(check_node_operation_end - check_node_operation_start)/1e6);
+
+    //_TCE_RTC(1, loop_2_start); // OpenASIP 2.0 doc (search for printf explanation)
+    //for (unsigned edge = 0; edge < nEdges; ++edge)
+    //    msgOut[edge][z] = out[edge];
+    //_TCE_RTC(1, loop_2_end); // OpenASIP 2.0 doc (search for printf explanation)
+    //total_loop_2 += (loop_2_end - loop_2_start);
     _TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
     printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total timer_declarations elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_timer_declarations/1e6);
     printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total nEdgesDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_nEdgesDec/1e6);
     printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total infDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_infDec/1e6);
     //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total msgOutDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_msgOutDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total loop_1 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_loop_1/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total inDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_inDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total outDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_outDec/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total in_init_loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_in_init_loop_2/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total out_init_loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_out_init_loop_2/1e6);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total loop_1 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_loop_1/1e6);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total inDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_inDec/1e6);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total outDec elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_outDec/1e6);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total in_init_loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_in_init_loop_2/1e6);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total out_init_loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_out_init_loop_2/1e6);
     printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total _OA_CHECK_NODE elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_oa_check_node_operation/1e6);
-    printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_loop_2/1e6);
+    //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode] total loop_2 elapsed time [s]: %.6f\n",sim_time/1e6,snr_g_id,blk_g_id,total_loop_2/1e6);
 
     _TCE_RTC(1, check_node_operation_in_end); // OpenASIP 2.0 doc (search for printf explanation)
     total_check_node_operation_in += (check_node_operation_in_end - check_node_operation_in_start);

@@ -133,421 +133,170 @@ std::vector<bool> nrLDPC::decode(
     const std::vector<float>& softBitsIn,
     const unsigned nMaxIter)
 {
-    assert(softBitsIn.size() == mN);
+    steady_clock::time_point check_node_operation_start;
+    steady_clock::time_point check_node_operation_end;
 
-    /*
-     * ------------------------------------------------------------------------
-     * RMSA state
-     *
-     * LLR[v]  = current variable-node LLR
-     * LLR0[v] = original channel LLR
-     *
-     * CtoVMsg[e]    = old check-to-variable message
-     * CtoVMsgNew[e] = newly calculated check-to-variable message
-     *
-     * Unlike the original layered decoder, ALL check nodes are processed
-     * from the same old CtoVMsg state before the variable-node update.
-     * ------------------------------------------------------------------------
-     */
+	assert(softBitsIn.size() == mN);
 
-    const unsigned nNodes = mN / mZc;
+	// initialize LLR in blocks(nodes), each node with Zc bits
+    vector<vector<float>> LLR(mN / mZc);
+	for (unsigned i = 0; i < mN / mZc; i++) {
+        //printf("\noi4 [%i/%i]\n",i,static_cast<int>(mN/mZc));
+		LLR[i] = vector<float>(softBitsIn.begin() + i * mZc, softBitsIn.begin() + (i + 1) * mZc);
+	}
 
-    std::vector<std::vector<float>> LLR(nNodes);
-    std::vector<std::vector<float>> LLR0(nNodes);
+	// find how many parity nodes to use for decoding
+	unsigned nMaxLayer;
+	if (mBGn == 1) {
+		// assume tx bits length =  ceil(kBar/R), alternatively can use all layers(slower)
+		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 20;
+        nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 20;
+    } else {
+		//nMaxLayer = ceil((ceil(mKBar / mR) + mF) / mZc) - 8;
+        nMaxLayer = ((mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1) / CODE_RATE_NUM + mF + mZc - 1) / mZc - 8;
+	}
 
-    for (unsigned i = 0; i < nNodes; ++i) {
-        LLR[i] = std::vector<float>(
-            softBitsIn.begin() + i * mZc,
-            softBitsIn.begin() + (i + 1) * mZc
-        );
+	// initialize msg from check nodes to vector nodes, each edge correspond a message
+    vector<vector<float>> CtoVMsg(mEdges.size());
+    int my_iter = 0;
+	for (auto& e : CtoVMsg) {
+        my_iter++;
+		e = vector<float>(mZc, 0);
+	}
+	// llr updates
+	unsigned nLayerEdges, edgeIdx, nShifts, vNodeIdx;
+	for (unsigned iIter = 0; iIter < nMaxIter; iIter++) {
+		for (unsigned iLayer = 0; iLayer < nMaxLayer; iLayer++) {
+			nLayerEdges = mLayers[iLayer].edgeEnd - mLayers[iLayer].edgeStart;
+			// messages from variable nodes to check node
+            vector<vector<float>> VtoCMsg(nLayerEdges);
+            my_iter = 0;
+			for (auto& e : VtoCMsg) {
+                my_iter++;
+				e = vector<float>(mZc, 0);
+			}
+			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
+				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
+				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
+				LLR[vNodeIdx] = eleWiseMinus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
+				VtoCMsg[iEdge] = LLR[vNodeIdx];
+				VtoCMsg[iEdge] = circShift(VtoCMsg[iEdge], nShifts);
+			}
 
-        LLR0[i] = LLR[i];
-    }
+            /*
+             * ================================================================
+             * CHECK-NODE PROCESSING
+             * ================================================================
+             */
+            check_node_operation_start = steady_clock::now();
+            vector<vector<float>> minSumMsgs(MAX_CHECK_NODE_DEGREE); 
+            for (auto& e : minSumMsgs)
+                e = vector<float>(mZc,0.0f); // avoid out-of-bounds read access error
+            printf("[t_sim [s] = %.4f][SNR_0%u][Block %u][decode][iIter %u ; iLayer %u] Started checkNodeOperation\n",duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iLayer);
+            checkNodeOperation(
+                VtoCMsg,
+                minSumMsgs
+            );
+            check_node_operation_end = steady_clock::now();
+            printf("[t_sim [s] = %.4f][SNR_0%u][Block %u][decode][iIter %u ; iLayer %u] Ended checkNodeOperation\n",duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iLayer);
+            printf("[t_sim [s] = %.4f][SNR_0%u][Block %u][decode][iIter %u ; iLayer %u] checkNodeOperation elapsed time [s]: %.9f\n",duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iLayer,
+                   duration_cast<microseconds>(check_node_operation_end - check_node_operation_start).count()/1e6);
 
-    /*
-     * ------------------------------------------------------------------------
-     * Number of layers used by the decoder.
-     *
-     * This is retained from the original implementation. The current RMSA
-     * checkNodeOperation processes the layers represented by mLayers.
-     * ------------------------------------------------------------------------
-     */
+			//message from check node to varible nodes
+			for (unsigned iEdge = 0; iEdge < nLayerEdges; iEdge++) {
+				edgeIdx = mLayers[iLayer].edgeStart + iEdge;
+				vNodeIdx = mEdges[edgeIdx].vNodeIdx; nShifts = mEdges[edgeIdx].nShifts;
+				CtoVMsg[edgeIdx] = circShift(minSumMsgs[iEdge], mZc - nShifts);
+				LLR[vNodeIdx] = eleWisePlus(LLR[vNodeIdx], CtoVMsg[edgeIdx]);
+			}
+		}
+        
+        vector<bool> hardCodeword(mN, false);
 
-    unsigned nMaxLayer;
-
-    if (mBGn == 1) {
-        nMaxLayer =
-            (
-                (
-                    (mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1)
-                    / CODE_RATE_NUM
-                    + mF
-                    + mZc - 1
-                ) / mZc
-            ) - 20;
-    }
-    else {
-        nMaxLayer =
-            (
-                (
-                    (mKBar * CODE_RATE_DEN + CODE_RATE_NUM - 1)
-                    / CODE_RATE_NUM
-                    + mF
-                    + mZc - 1
-                ) / mZc
-            ) - 8;
-    }
-
-    /*
-     * Currently the RMSA check-node operation works over mLayers.
-     *
-     * Keep the calculation above because it corresponds to the TTA
-     * implementation and may be used later to limit the layer set.
-     */
-    (void)nMaxLayer;
-
-    /*
-     * ------------------------------------------------------------------------
-     * Initialize C -> V messages.
-     *
-     * Initially:
-     *
-     *     Lambda_(c->v) = 0
-     * ------------------------------------------------------------------------
-     */
-
-    std::vector<std::vector<float>> CtoVMsg(
-        mEdges.size(),
-        std::vector<float>(mZc, 0.0)
-    );
-
-    std::vector<std::vector<float>> CtoVMsgNew(
-        mEdges.size(),
-        std::vector<float>(mZc, 0.0)
-    );
-
-    /*
-     * ------------------------------------------------------------------------
-     * RMSA iterations
-     * ------------------------------------------------------------------------
-     */
-
-    for (unsigned iIter = 0; iIter < nMaxIter; ++iIter) {
-
-        /*
-         * ================================================================
-         * CHECK-NODE UPDATE
-         *
-         * V -> C:
-         *
-         *     VtoC[e] = LLR[v] - CtoVMsg[e]
-         *
-         * followed by the circulant shift associated with the edge.
-         *
-         * IMPORTANT:
-         *
-         * CtoVMsg is the OLD iteration state.
-         * CtoVMsgNew receives the NEW state.
-         *
-         * Therefore no check node modifies LLR while another check node
-         * is being processed.
-         * ================================================================
-         */
-
-        std::vector<std::vector<float>> VtoCMsg(
-            mEdges.size(),
-            std::vector<float>(mZc, 0.0)
-        );
-
-        for (unsigned edgeIdx = 0;
-             edgeIdx < mEdges.size();
-             ++edgeIdx)
-        {
-            const unsigned vNodeIdx =
-                mEdges[edgeIdx].vNodeIdx;
-
-            const unsigned nShifts =
-                mEdges[edgeIdx].nShifts;
-
-            VtoCMsg[edgeIdx] =
-                eleWiseMinus(
-                    LLR[vNodeIdx],
-                    CtoVMsg[edgeIdx]
-                );
-
-            VtoCMsg[edgeIdx] =
-                circShift(
-                    VtoCMsg[edgeIdx],
-                    nShifts
-                );
+        unsigned bitIdx = 0;
+        for (unsigned iNode = 0; iNode < LLR.size(); ++iNode) {
+            for (unsigned i = 0; i < mZc; ++i) {
+                hardCodeword[bitIdx++] = (LLR[iNode][i] <= 0.0f);
+            }
         }
 
-        /*
-         * ================================================================
-         * CHECK-NODE PROCESSING
-         * ================================================================
-         */
-
-        checkNodeOperation(
-            VtoCMsg,
-            CtoVMsgNew
-        );
-
-        /*
-         * ================================================================
-         * VARIABLE-NODE UPDATE
-         *
-         *     LLR[v] = LLR0[v] + sum_c CtoVMsgNew[c->v]
-         *
-         * Every variable node starts from the original channel LLR.
-         * ================================================================
-         */
-
-        for (unsigned vNodeIdx = 0;
-             vNodeIdx < LLR.size();
-             ++vNodeIdx)
-        {
-            LLR[vNodeIdx] = LLR0[vNodeIdx];
+        if (checkSumCodeWord(hardCodeword)) {
+            printf(
+                "[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i] decode converged at iteration %u\n",
+                duration_cast<microseconds>(steady_clock::now() - sim_time).count()/1e6,snr_g,blk_g,iIter,iIter + 1);
+            break;
         }
+        
+	}
+	// flatten the 2-D vector LLR
+    vector<float> vecLLR;
+    my_iter = 0;
+	for (auto e : LLR) {
+        my_iter++;
+		vecLLR.insert(vecLLR.end(), e.begin(), e.end());
+	}
 
-        for (unsigned edgeIdx = 0;
-             edgeIdx < mEdges.size();
-             ++edgeIdx)
-        {
-            const unsigned vNodeIdx =
-                mEdges[edgeIdx].vNodeIdx;
+	// chose information bits
+    vector<bool> decBits(mKBar, false);
+    my_iter = 0;
+	for (unsigned i = 0; i < mKBar; i++) {
+        my_iter++;
+		decBits[i] = (vecLLR[i] <= 0);
+	}
 
-            const unsigned nShifts =
-                mEdges[edgeIdx].nShifts;
-
-            std::vector<float> msg =
-                circShift(
-                    CtoVMsgNew[edgeIdx],
-                    mZc - nShifts
-                );
-
-            LLR[vNodeIdx] =
-                eleWisePlus(
-                    LLR[vNodeIdx],
-                    msg
-                );
-        }
-
-        /*
-         * ================================================================
-         * NEW ITERATION STATE
-         * ================================================================
-         */
-
-        CtoVMsg = CtoVMsgNew;
-    }
-
-    /*
-     * ------------------------------------------------------------------------
-     * Final hard decision.
-     * ------------------------------------------------------------------------
-     *
-     * Flatten LLR and extract the information bits.
-     *
-     * Keep mKBar here because this is the existing x86_64 interface's
-     * expected decoded information length.
-     */
-
-    std::vector<float> vecLLR;
-    vecLLR.reserve(LLR.size() * mZc);
-
-    for (const auto& node : LLR) {
-        vecLLR.insert(
-            vecLLR.end(),
-            node.begin(),
-            node.end()
-        );
-    }
-
-    std::vector<bool> decBits(mKBar, false);
-
-    for (unsigned i = 0; i < mKBar; ++i) {
-        decBits[i] = (vecLLR[i] <= 0.0);
-    }
-
-    return decBits;
+	return decBits;
 }
+
 void nrLDPC::checkNodeOperation(
-    const std::vector<std::vector<float>>& VtoCMsg,
+    const std::vector<std::vector<float>>& msgIn,
     std::vector<std::vector<float>>& msgOut)
 {
-    assert(VtoCMsg.size() == mEdges.size());
-    assert(msgOut.size() == mEdges.size());
+// ------------------------------------------------------------------------------------------------
+	// [ref] Chen, Jinghu, R.M. Tanner, C. Jones, and Yan Li. "Improved min-sum decoding algorithms for
+	// irregular LDPC codes." In Proceedings. International Symposium on Information Theory, 2005.
+	//-------------------------------------------------------------------------------------------------
 
-    /*
-     * ------------------------------------------------------------------------
-     * CHECK-NODE PROCESSING
-     * ------------------------------------------------------------------------
-     */
+	unsigned nNodes = msgIn.size();
 
-    for (unsigned iLayer = 0;
-         iLayer < mLayers.size();
-         ++iLayer)
-    {
-        const unsigned edgeStart =
-            mLayers[iLayer].edgeStart;
+	vector<vector<float>> msgMat = transposeMat(msgIn);
+	vector<size_t> sortedIdx(nNodes, 0);
+	vector<float> sign(nNodes, 1.0);
+	float min1, min2, parity;
+	size_t min1Idx, min2Idx;
 
-        const unsigned edgeEnd =
-            mLayers[iLayer].edgeEnd;
+	vector<vector<float>> msgMatOut(mZc);
+	for (unsigned i = 0; i < mZc; i++) {
+		// sort abs(llr)
+		sortedIdx = sort_indexes(msgMat[i]);
+		min1Idx = sortedIdx[0];
+		min2Idx = sortedIdx[1];
 
-        const unsigned nNodes =
-            edgeEnd - edgeStart;
+		//minimum and second minimum
+		min1 = abs(msgMat[i][min1Idx]);
+		min2 = abs(msgMat[i][min2Idx]);
 
-        assert(nNodes >= 2);
-        assert(nNodes <= MAX_CHECK_NODE_DEGREE);
+		// offset
+		min1 = (min1 > 0.5) ? min1 - 0.5 : 0;
+		min2 = (min2 > 0.5) ? min2 - 0.5 : 0;
 
-        for (unsigned z = 0;
-             z < mZc;
-             ++z)
-        {
-            /*
-             * ------------------------------------------------------------
-             * Find minimum, second minimum and total parity.
-             * ------------------------------------------------------------
-             */
+		// absoulte value of msgMatOut
+		msgMatOut[i] = vector<float>(msgMat[i].size(), min1);
+		msgMatOut[i][min1Idx] = min2;
 
-            float min1 =
-                std::numeric_limits<float>::max();
+		// assign to output
+		parity = 1.0;
+		for (unsigned j = 0; j < nNodes; j++) {
+			sign[j] = 2.0 * (msgMat[i][j] >= 0) - 1.0;
+			parity = parity * sign[j];
+		}
+		for (unsigned j = 0; j < nNodes; j++) {
+			msgMatOut[i][j] = msgMatOut[i][j] * parity * sign[j];
+		}
+	}
 
-            float min2 =
-                std::numeric_limits<float>::max();
-
-            unsigned min1Idx = 0;
-
-            float parity = 1.0;
-
-            for (unsigned j = 0;
-                 j < nNodes;
-                 ++j)
-            {
-                const float value =
-                    VtoCMsg[edgeStart + j][z];
-
-                const float absValue =
-                    std::fabs(value);
-
-                if (absValue < min1)
-                {
-                    min2 = min1;
-                    min1 = absValue;
-                    min1Idx = j;
-                }
-                else if (absValue < min2)
-                {
-                    min2 = absValue;
-                }
-
-                if (value < 0.0)
-                {
-                    parity = -parity;
-                }
-            }
-
-            /*
-             * ------------------------------------------------------------
-             * Generate extrinsic messages.
-             *
-             * No 0.5 correction here.
-             *
-             * The correction is applied below, after all CN outputs
-             * have been generated.
-             * ------------------------------------------------------------
-             */
-
-            for (unsigned j = 0;
-                 j < nNodes;
-                 ++j)
-            {
-                const float value =
-                    VtoCMsg[edgeStart + j][z];
-
-                const float sign =
-                    (value < 0.0)
-                        ? -1.0
-                        : 1.0;
-
-                const float magnitude =
-                    (j == min1Idx)
-                        ? min2
-                        : min1;
-
-                msgOut[edgeStart + j][z] =
-                    magnitude *
-                    parity *
-                    sign;
-            }
-        }
-    }
-
-    /*
-     * ------------------------------------------------------------------------
-     * Offset-min-sum correction + inverse circulant shift.
-     * ------------------------------------------------------------------------
-     */
-
-    for (unsigned iLayer = 0;
-         iLayer < mLayers.size();
-         ++iLayer)
-    {
-        const unsigned edgeStart =
-            mLayers[iLayer].edgeStart;
-
-        const unsigned edgeEnd =
-            mLayers[iLayer].edgeEnd;
-
-        const unsigned nNodes =
-            edgeEnd - edgeStart;
-
-        for (unsigned iEdge = 0;
-             iEdge < nNodes;
-             ++iEdge)
-        {
-            const unsigned edgeIdx =
-                edgeStart + iEdge;
-
-            const unsigned nShifts =
-                mEdges[edgeIdx].nShifts;
-
-            std::vector<float> msg(mZc);
-
-            //for (unsigned z = 0;
-            //     z < mZc;
-            //     ++z)
-            //{
-            //    const float value =
-            //        msgOut[edgeIdx][z];
-
-            //    float magnitude =
-            //        std::fabs(value);
-
-            //    if (magnitude > 0.5)
-            //    {
-            //        magnitude -= 0.5;
-            //    }
-            //    else
-            //    {
-            //        magnitude = 0.0;
-            //    }
-
-            //    msg[z] =
-            //        (value < 0.0)
-            //            ? -magnitude
-            //            : magnitude;
-            //}
-
-            msgOut[edgeIdx] =
-                circShift(
-                    msg,
-                    mZc - nShifts
-                );
-        }
-    }
+	msgOut = transposeMat(msgMatOut);
 }
+
 vector<bool> nrLDPC::rateMatch(const vector<bool>& bitsIn, size_t nOfBitOut)
 {
 	if (mBGn == 1)
