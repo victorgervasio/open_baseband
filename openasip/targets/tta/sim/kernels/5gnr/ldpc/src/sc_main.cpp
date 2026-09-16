@@ -1519,12 +1519,18 @@ int sc_main(
     encoder_tta.setOperationSimulator(
         "lsu",
         lsu1);
-    //encoder_tta.setOperationSimulator(
-    //    "lsu_1",
-    //    lsu1);
-    //encoder_tta.setOperationSimulator(
-    //    "lsu_1_1",
-    //    lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1",
+        lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1_1",
+        lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1_2",
+        lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1_2_1",
+        lsu1);
 
     /*
      * Application-specific connection to our shared memory.
@@ -1565,12 +1571,18 @@ int sc_main(
     decoder_tta.setOperationSimulator(
         "lsu",
         lsu2);
-    //decoder_tta.setOperationSimulator(
-    //    "lsu_1",
-    //    lsu2);
-    //decoder_tta.setOperationSimulator(
-    //    "lsu_1_1",
-    //    lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1",
+        lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1_1",
+        lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1_2",
+        lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1_2_1",
+        lsu2);
 
     /*
      * Both LSU models point to the SAME shared-memory object.

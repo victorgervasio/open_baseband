@@ -367,17 +367,106 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
 
     //_TCE_RTC(1, sim_time); // OpenASIP 2.0 doc (search for printf explanation)
     //printf("[t_sim [s] = %.6f][SNR_0%i][Block %i][decode][iIter %i ; iLayer %i] Started checkNodeOperation\n",sim_time/1e6,snr_g_id,blk_g_id,iIter,iLayer);
+    const float *in0, *in1, *in2, *in3, *in4, *in5;
+    const float *in6, *in7, *in8, *in9, *in10, *in11;
+    const float *in12, *in13, *in14, *in15, *in16, *in17, *in18;
     switch (nEdges) {
 
-        case 3:
+        case 3: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, INF, INF,
+                        INF , INF , INF , INF, INF,
+                        INF , INF , INF , INF, INF,
+                        INF , INF , INF , INF,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
+                        discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10], discard[11],
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-            for (unsigned z = 0; z < mZc; ++z) {
+            for (unsigned z = 0; z < mZc-4; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], INF, INF,
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
+                //    discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10], discard[11],
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], INF, INF,
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10], discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10], discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+
+                ++in0 ; ++in1 ; ++in2 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10], discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+
+                ++in0 ; ++in1 ; ++in2 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF, INF,
+                    INF , INF , INF , INF,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], discard[0] , discard[1] ,
                     discard[2]  , discard[3]  , discard[4]  , discard[5] , discard[6] ,
@@ -387,19 +476,61 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 4: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
 
-        case 4:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, INF,
+                        INF , INF , INF , INF , INF,
+                        INF , INF , INF , INF , INF,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
+                        discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10]  , discard[11],
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-            for (unsigned z = 0; z < mZc; ++z) {
+            for (unsigned z = 0; z < mZc-4; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], INF,
+                //    INF        , INF        , INF        , INF        , INF,
+                //    INF        , INF        , INF        , INF        , INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
+                //    discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10]  , discard[11],
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], INF,
-                    INF        , INF        , INF        , INF        , INF,
-                    INF        , INF        , INF        , INF        , INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
                     discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
@@ -408,20 +539,114 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ;
+                ++z; 
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10]  , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ;
+                ++z; 
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10]  , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ;
+                ++z; 
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF , INF,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z] , discard[1] ,
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]   , discard[6] ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10]  , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+            //    ++out0 ; ++out1 ; ++out2 ; ++out3 ;
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 5: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
 
-        case 5:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, *in4,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                        discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11],
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
-            for (unsigned z = 0; z < mZc; ++z) {
+            for (unsigned z = 0; z < mZc-4; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                //    INF        , INF        , INF        , INF, INF   ,
+                //    INF        , INF        , INF        , INF, INF   ,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                //    discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11],
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
-                    INF        , INF        , INF        , INF, INF   ,
-                    INF        , INF        , INF        , INF, INF   ,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, *in4,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
                     discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
@@ -430,20 +655,117 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    discard[2]  , discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11],
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+            //    ++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 6: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
+            const float *in5 = msgIn[5].data();
 
-        case 6:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            //const float *out5 = msgOut[5].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, *in4,
+                        *in5, INF , INF , INF , INF ,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                        msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                    ++in5 ;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             for (unsigned z = 0; z < mZc; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                //    msgIn[5][z], INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                //    msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
-                    msgIn[5][z], INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
                     msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
@@ -452,20 +774,123 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, INF , INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], discard[3]  , discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+                //++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
+                //++out5 ;
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 7: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
+            const float *in5 = msgIn[5].data();
+            const float *in6 = msgIn[6].data();
 
-        case 7:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            //const float *out5 = msgOut[5].data();
+            //const float *out6 = msgOut[6].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, *in4,
+                        *in5, *in6, INF , INF , INF ,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                        msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                    ++in5 ; ++in6 ;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             for (unsigned z = 0; z < mZc; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                //    msgIn[5][z], msgIn[6][z], INF        , INF, INF,
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                //    msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
-                    msgIn[5][z], msgIn[6][z], INF        , INF, INF,
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
                     msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
@@ -474,20 +899,125 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, INF , INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], discard[4]  , discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+                //++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
+                //++out5 ; ++out6 ;
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 8: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
+            const float *in5 = msgIn[5].data();
+            const float *in6 = msgIn[6].data();
+            const float *in7 = msgIn[7].data();
 
-        case 8:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            //const float *out5 = msgOut[5].data();
+            //const float *out6 = msgOut[6].data();
+            //const float *out7 = msgOut[7].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, *in4,
+                        *in5, *in6, *in7, INF , INF ,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                        msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                    ++in5 ; ++in6 ; ++in7 ;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             for (unsigned z = 0; z < mZc; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                //    msgIn[5][z], msgIn[6][z], msgIn[7][z], INF, INF,
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                //    msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
-                    msgIn[5][z], msgIn[6][z], msgIn[7][z], INF, INF,
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
                     msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
@@ -496,20 +1026,127 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, INF , INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], discard[5]  , discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                
+                //++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
+                //++out5 ; ++out6 ; ++out7 ;
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 9: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
+            const float *in5 = msgIn[5].data();
+            const float *in6 = msgIn[6].data();
+            const float *in7 = msgIn[7].data();
+            const float *in8 = msgIn[8].data();
 
-        case 9:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            //const float *out5 = msgOut[5].data();
+            //const float *out6 = msgOut[6].data();
+            //const float *out7 = msgOut[7].data();
+            //const float *out8 = msgOut[8].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, *in4,
+                        *in5, *in6, *in7, *in8, INF ,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                        msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
+                        discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                    ++in5 ; ++in6 ; ++in7 ; ++in8 ;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             for (unsigned z = 0; z < mZc; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                //    msgIn[5][z], msgIn[6][z], msgIn[7][z], msgIn[8][z], INF,
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                //    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
-                    msgIn[5][z], msgIn[6][z], msgIn[7][z], msgIn[8][z], INF,
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
                     msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
@@ -518,20 +1155,129 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, INF ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], discard[6]  ,
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+                //++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
+                //++out5 ; ++out6 ; ++out7 ; ++out8 ;
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 10: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
+            const float *in5 = msgIn[5].data();
+            const float *in6 = msgIn[6].data();
+            const float *in7 = msgIn[7].data();
+            const float *in8 = msgIn[8].data();
+            const float *in9 = msgIn[9].data();
 
-        case 10:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            //const float *out5 = msgOut[5].data();
+            //const float *out6 = msgOut[6].data();
+            //const float *out7 = msgOut[7].data();
+            //const float *out8 = msgOut[8].data();
+            //const float *out9 = msgOut[9].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0, *in1, *in2, *in3, *in4,
+                        *in5, *in6, *in7, *in8, *in9 ,
+                        INF , INF , INF , INF , INF ,
+                        INF , INF , INF , INF ,
+
+                        msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                        msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
+                        discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                        discard[12] , discard[13] , discard[14] , discard[15]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                    ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             for (unsigned z = 0; z < mZc; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
+                //    msgIn[5][z], msgIn[6][z], msgIn[7][z], msgIn[8][z], msgIn[9][z],
+                //    INF        , INF        , INF        , INF, INF,
+                //    INF        , INF        , INF        , INF,
+
+                //    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                //    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
+                //    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                //    discard[12] , discard[13] , discard[14] , discard[15]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z], msgIn[1][z], msgIn[2][z], msgIn[3][z], msgIn[4][z],
-                    msgIn[5][z], msgIn[6][z], msgIn[7][z], msgIn[8][z], msgIn[9][z],
-                    INF        , INF        , INF        , INF, INF,
-                    INF        , INF        , INF        , INF,
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, *in9 ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
 
                     msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
                     msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
@@ -540,20 +1286,149 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, *in9 ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, *in9 ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0, *in1, *in2, *in3, *in4,
+                    *in5, *in6, *in7, *in8, *in9 ,
+                    INF , INF , INF , INF , INF ,
+                    INF , INF , INF , INF ,
+
+                    msgOut[0][z], msgOut[1][z], msgOut[2][z], msgOut[3][z], msgOut[4][z],
+                    msgOut[5][z], msgOut[6][z], msgOut[7][z], msgOut[8][z], msgOut[9][z],
+                    discard[7]  , discard[8]  , discard[9]  , discard[10] , discard[11] ,
+                    discard[12] , discard[13] , discard[14] , discard[15]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+                //++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
+                //++out5 ; ++out6 ; ++out7 ; ++out8 ; ++out9 ; 
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+            break;
+        }
+        case 19: {
+            const float *in0 = msgIn[0].data();
+            const float *in1 = msgIn[1].data();
+            const float *in2 = msgIn[2].data();
+            const float *in3 = msgIn[3].data();
+            const float *in4 = msgIn[4].data();
+            const float *in5 = msgIn[5].data();
+            const float *in6 = msgIn[6].data();
+            const float *in7 = msgIn[7].data();
+            const float *in8 = msgIn[8].data();
+            const float *in9 = msgIn[9].data();
+            const float *in10 = msgIn[10].data();
+            const float *in11 = msgIn[11].data();
+            const float *in12 = msgIn[12].data();
+            const float *in13 = msgIn[13].data();
+            const float *in14 = msgIn[14].data();
+            const float *in15 = msgIn[15].data();
+            const float *in16 = msgIn[16].data();
+            const float *in17 = msgIn[17].data();
+            const float *in18 = msgIn[18].data();
 
-        case 19:
+            //const float *out0 = msgOut[0].data();
+            //const float *out1 = msgOut[1].data();
+            //const float *out2 = msgOut[2].data();
+            //const float *out3 = msgOut[3].data();
+            //const float *out4 = msgOut[4].data();
+            //const float *out5 = msgOut[5].data();
+            //const float *out6 = msgOut[6].data();
+            //const float *out7 = msgOut[7].data();
+            //const float *out8 = msgOut[8].data();
+            //const float *out9 = msgOut[9].data();
+            //const float *out10 = msgOut[10].data();
+            //const float *out11 = msgOut[11].data();
+            //const float *out12 = msgOut[12].data();
+            //const float *out13 = msgOut[13].data();
+            //const float *out14 = msgOut[14].data();
+            //const float *out15 = msgOut[15].data();
+            //const float *out16 = msgOut[16].data();
+            //const float *out17 = msgOut[17].data();
+            //const float *out18 = msgOut[18].data();
+            if (mZc < 4) {
+                _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                for (unsigned z = 0; z < mZc; ++z) {
+                    _OA_CHECK_NODE_19(
+                        *in0 , *in1 , *in2 , *in3 , *in4 ,
+                        *in5 , *in6 , *in7 , *in8 , *in9 ,
+                        *in10, *in11, *in12, *in13, *in14,
+                        *in15, *in16, *in17, *in18,
+
+                        msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
+                        msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
+                        msgOut[10][z], msgOut[11][z], msgOut[12][z], msgOut[13][z], msgOut[14][z],
+                        msgOut[15][z], msgOut[16][z], msgOut[17][z], msgOut[18][z]
+                    );
+                    //_TCE_RTC(1,oa_check_node_operation_end);
+                    //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                    ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                    ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                    ++in10; ++in11; ++in12; ++in13; ++in14; 
+                    ++in15; ++in16; ++in17; ++in18;
+                }
+                _TCE_RTC(1,oa_check_node_operation_end);
+                total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                break;
+            }
             _TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
             for (unsigned z = 0; z < mZc; ++z) {
                 //_TCE_RTC(1, oa_check_node_operation_start); // OpenASIP 2.0 doc (search for printf explanation)
+                //_OA_CHECK_NODE_19(
+                //    msgIn[0][z] , msgIn[1][z] , msgIn[2][z] , msgIn[3][z] , msgIn[4][z] ,
+                //    msgIn[5][z] , msgIn[6][z] , msgIn[7][z] , msgIn[8][z] , msgIn[9][z] ,
+                //    msgIn[10][z], msgIn[11][z], msgIn[12][z], msgIn[13][z], msgIn[14][z],
+                //    msgIn[15][z], msgIn[16][z], msgIn[17][z], msgIn[18][z],
+
+                //    msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
+                //    msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
+                //    msgOut[10][z], msgOut[11][z], msgOut[12][z], msgOut[13][z], msgOut[14][z],
+                //    msgOut[15][z], msgOut[16][z], msgOut[17][z], msgOut[18][z]
+                //);
                 _OA_CHECK_NODE_19(
-                    msgIn[0][z] , msgIn[1][z] , msgIn[2][z] , msgIn[3][z] , msgIn[4][z] ,
-                    msgIn[5][z] , msgIn[6][z] , msgIn[7][z] , msgIn[8][z] , msgIn[9][z] ,
-                    msgIn[10][z], msgIn[11][z], msgIn[12][z], msgIn[13][z], msgIn[14][z],
-                    msgIn[15][z], msgIn[16][z], msgIn[17][z], msgIn[18][z],
+                    *in0 , *in1 , *in2 , *in3 , *in4 ,
+                    *in5 , *in6 , *in7 , *in8 , *in9 ,
+                    *in10, *in11, *in12, *in13, *in14,
+                    *in15, *in16, *in17, *in18,
 
                     msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
                     msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
@@ -562,11 +1437,73 @@ void nrLDPC::checkNodeOperation(const etl::vector<etl::vector<float, MAX_ZC>, MA
                 );
                 //_TCE_RTC(1,oa_check_node_operation_end);
                 //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                ++in10; ++in11; ++in12; ++in13; ++in14; 
+                ++in15; ++in16; ++in17; ++in18;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0 , *in1 , *in2 , *in3 , *in4 ,
+                    *in5 , *in6 , *in7 , *in8 , *in9 ,
+                    *in10, *in11, *in12, *in13, *in14,
+                    *in15, *in16, *in17, *in18,
+
+                    msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
+                    msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
+                    msgOut[10][z], msgOut[11][z], msgOut[12][z], msgOut[13][z], msgOut[14][z],
+                    msgOut[15][z], msgOut[16][z], msgOut[17][z], msgOut[18][z]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                ++in10; ++in11; ++in12; ++in13; ++in14; 
+                ++in15; ++in16; ++in17; ++in18;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0 , *in1 , *in2 , *in3 , *in4 ,
+                    *in5 , *in6 , *in7 , *in8 , *in9 ,
+                    *in10, *in11, *in12, *in13, *in14,
+                    *in15, *in16, *in17, *in18,
+
+                    msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
+                    msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
+                    msgOut[10][z], msgOut[11][z], msgOut[12][z], msgOut[13][z], msgOut[14][z],
+                    msgOut[15][z], msgOut[16][z], msgOut[17][z], msgOut[18][z]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+                ++in0 ; ++in1 ; ++in2 ; ++in3 ; ++in4 ; 
+                ++in5 ; ++in6 ; ++in7 ; ++in8 ; ++in9 ; 
+                ++in10; ++in11; ++in12; ++in13; ++in14; 
+                ++in15; ++in16; ++in17; ++in18;
+                ++z;
+
+                _OA_CHECK_NODE_19(
+                    *in0 , *in1 , *in2 , *in3 , *in4 ,
+                    *in5 , *in6 , *in7 , *in8 , *in9 ,
+                    *in10, *in11, *in12, *in13, *in14,
+                    *in15, *in16, *in17, *in18,
+
+                    msgOut[0][z] , msgOut[1][z] , msgOut[2][z] , msgOut[3][z] , msgOut[4][z] ,
+                    msgOut[5][z] , msgOut[6][z] , msgOut[7][z] , msgOut[8][z] , msgOut[9][z] ,
+                    msgOut[10][z], msgOut[11][z], msgOut[12][z], msgOut[13][z], msgOut[14][z],
+                    msgOut[15][z], msgOut[16][z], msgOut[17][z], msgOut[18][z]
+                );
+                //_TCE_RTC(1,oa_check_node_operation_end);
+                //total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
+
+                //++out0 ; ++out1 ; ++out2 ; ++out3 ; ++out4 ; 
+                //++out5 ; ++out6 ; ++out7 ; ++out8 ; ++out9 ; 
+                //++out10; ++out11; ++out12; ++out13; ++out14; 
+                //++out15; ++out16; ++out17; ++out18;
             }
-            break;
             _TCE_RTC(1,oa_check_node_operation_end);
             total_oa_check_node_operation += (oa_check_node_operation_end - oa_check_node_operation_start);
-        
+            break;
+        } 
         default:
             printf("Invalid nEdges: %i\n",nEdges);
     
