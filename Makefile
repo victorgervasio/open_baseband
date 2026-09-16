@@ -97,6 +97,7 @@ configure: ensure-etl ensure-sim-venv
 		-DSIM_OUTPUT_DIR="$(SIM_OUTPUT_DIR)" \
 		-DDATASET_LOG_DIR="$(DATASET_LOG_DIR)" \
 		-DCMAKE_BUILD_TYPE="$(CMAKE_BUILD_TYPE)" \
+		-DOPENASIP_OPSET_BASE_PATH="$(OPENASIP_OPSET_BASE_PATH)" \
         -DCMAKE_C_FLAGS="-fdiagnostics-color=always" \
         -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always" \
         -DCMAKE_COLOR_DIAGNOSTICS=ON

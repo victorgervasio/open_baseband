@@ -94,6 +94,12 @@ static unsigned lsuWidth(const std::string& op)
         return 4;
     }
 
+    if (op == "ldw8" ||
+        op == "stw8")
+    {
+        return 8 * sizeof(uint32_t);   // 32 bytes
+    }
+
     return 0;
 }
 
@@ -221,6 +227,18 @@ public:
             memory_ + offset,
             &value,
             sizeof(value));
+    }
+
+    void readW8(unsigned address, uint32_t values[8]) const
+    {
+        for (unsigned i = 0; i < 8; ++i)
+            values[i] = read32(address + 4 * i);
+    }
+
+    void writeW8(unsigned address, const uint32_t values[8])
+    {
+        for (unsigned i = 0; i < 8; ++i)
+            write32(address + 4 * i, values[i]);
     }
 
     template <typename T>
@@ -387,6 +405,9 @@ TCE_SC_OPERATION_SIMULATOR(LSUModel)
         /*
          * Determine access width from the actual operation.
          */
+        const bool isLDW8 = opName == "ldw8";
+        const bool isSTW8 = opName == "stw8";
+
         unsigned width = 0;
 
         if (opName == "ld8" ||
@@ -413,6 +434,11 @@ TCE_SC_OPERATION_SIMULATOR(LSUModel)
                  opName == "ST32")
         {
             width = 4;
+        }
+        else if (opName == "ldw8" ||
+                 opName == "stw8")
+        {
+            width = 8 * sizeof(uint32_t);
         }
 
         /*
@@ -456,6 +482,43 @@ TCE_SC_OPERATION_SIMULATOR(LSUModel)
         if (!shared_memory->valid(address, width))
         {
             return false;
+        }
+
+        /* LDW8 */
+        if (isSTW8)
+        {
+            uint32_t values[8];
+
+            values[0] = TCE_SC_UINT(2);
+            values[1] = TCE_SC_UINT(3);
+            values[2] = TCE_SC_UINT(4);
+            values[3] = TCE_SC_UINT(5);
+            values[4] = TCE_SC_UINT(6);
+            values[5] = TCE_SC_UINT(7);
+            values[6] = TCE_SC_UINT(8);
+            values[7] = TCE_SC_UINT(9);
+
+            shared_memory->writeW8(address, values);
+
+            return true;
+        }
+
+        if (isLDW8)
+        {
+            uint32_t values[8];
+
+            shared_memory->readW8(address, values);
+
+            TCE_SC_OUTPUT(2) = values[0];
+            TCE_SC_OUTPUT(3) = values[1];
+            TCE_SC_OUTPUT(4) = values[2];
+            TCE_SC_OUTPUT(5) = values[3];
+            TCE_SC_OUTPUT(6) = values[4];
+            TCE_SC_OUTPUT(7) = values[5];
+            TCE_SC_OUTPUT(8) = values[6];
+            TCE_SC_OUTPUT(9) = values[7];
+
+            return true;
         }
 
         /*
@@ -1529,7 +1592,16 @@ int sc_main(
         "lsu_1_2",
         lsu1);
     encoder_tta.setOperationSimulator(
-        "lsu_1_2_1",
+        "lsu_1_3",
+        lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1_3_1",
+        lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1_3_2",
+        lsu1);
+    encoder_tta.setOperationSimulator(
+        "lsu_1_3_3",
         lsu1);
 
     /*
@@ -1581,7 +1653,16 @@ int sc_main(
         "lsu_1_2",
         lsu2);
     decoder_tta.setOperationSimulator(
-        "lsu_1_2_1",
+        "lsu_1_3",
+        lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1_3_1",
+        lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1_3_2",
+        lsu2);
+    decoder_tta.setOperationSimulator(
+        "lsu_1_3_3",
         lsu2);
 
     /*

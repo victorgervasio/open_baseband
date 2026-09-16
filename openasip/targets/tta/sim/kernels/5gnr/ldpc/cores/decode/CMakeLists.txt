@@ -62,7 +62,8 @@ file(
 file(
     GLOB_RECURSE LDPC_OSED_SOURCES
     CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_LIST_DIR}/../../../../../../arch/custom/osal/kernels/5gnr/ldpc/*"
+    "${OPENASIP_ROOT}/arch/custom/osal/kernels/5gnr/ldpc/*"
+    "${OPENASIP_OPSET_BASE_PATH}/*"
 )
 
 # Generator programs are built separately by targets/common and must not be

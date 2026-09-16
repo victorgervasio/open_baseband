@@ -7,6 +7,6 @@ export PATH=$HOME/local/bin:$PATH
 export LDFLAGS=-L$HOME/local/lib
 
 export TCE_OSAL_PATH=${SCRIPT_DIR}/../arch/custom/osal/kernels/5gnr/ldpc
-
+export OPENASIP_OPSET_BASE_PATH=${HOME}/local/share/openasip/opset/base
 #source "${SCRIPT_DIR}/rtl_generator_completion.sh"
 #alias rtl_generator="${SCRIPT_DIR}/rtl_generator.exe"
