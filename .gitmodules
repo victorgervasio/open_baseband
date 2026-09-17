@@ -1,0 +1,6 @@
+[submodule "openasip/targets/common/kernels/lib/cpp/etl"]
+	path = openasip/targets/common/kernels/lib/cpp/etl
+	url = https://github.com/victorgervasio/etl.git
+[submodule "openasip/arch/custom/hdb"]
+	path = openasip/arch/custom/hdb
+	url = https://github.com/victorgervasio/open_baseband-hdb.git
