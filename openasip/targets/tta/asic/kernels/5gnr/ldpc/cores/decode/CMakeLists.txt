@@ -1,6 +1,7 @@
 set(KERNEL_TARGET "build-tta-asic-kernels-5gnr-ldpc-decode")
-set(KERNEL_NAME "asic_5gnr_ldpc_decode")
-set(ASIC_ADF_FILE "${CMAKE_CURRENT_LIST_DIR}/arch/asic_5gnr_ldpc_decode.adf")
+set(KERNEL "5gnr_ldpc_decode")
+set(KERNEL_NAME "asic_${KERNEL}")
+set(ASIC_ADF_FILE "${OPENASIP_ROOT}/arch/asic_5gnr_ldpc_decode.adf")
 set(ASIC_TPEF_FILE "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}.tpef")
 
 # ---------------------------------------------------------------------------
@@ -30,12 +31,22 @@ file(
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_SOURCES
+    GLOB_RECURSE LDPC_TTA_ASIC_CORES_COMMON_SOURCES
+    CONFIGURE_DEPENDS
+    "${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/cores/common/src/*.cpp"
+)
+file(
+    GLOB_RECURSE LDPC_TTA_ASIC_CORES_COMMON_HEADERS
+    CONFIGURE_DEPENDS
+    "${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/cores/common/include/*.h"
+)
+file(
+    GLOB_RECURSE LDPC_TTA_ASIC_COMMON_SOURCES
     CONFIGURE_DEPENDS
     "${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/common/src/*.cpp"
 )
 file(
-    GLOB_RECURSE LDPC_TTA_ASIC_HEADERS
+    GLOB_RECURSE LDPC_TTA_ASIC_COMMON_HEADERS
     CONFIGURE_DEPENDS
     "${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/common/include/*.h"
 )
@@ -52,12 +63,13 @@ file(
 file(
     GLOB_RECURSE LDPC_OSED_SOURCES
     CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_LIST_DIR}/../../../../../../../../arch/custom/osal/kernels/5gnr/ldpc*"
+    "${OPENASIP_ROOT}/arch/custom/osal/kernels/5gnr/ldpc/*"
+    "${OPENASIP_OPSET_BASE_PATH}/*"
 )
 
 # Generator programs are built separately by targets/common and must not be
 # compiled as part of the TTA kernel.
-list(FILTER LDPC_DECODE_TTA_ASIC_SOURCES EXCLUDE REGEX "/temp/")
+list(FILTER LDPC_TTA_SIM_COMMON_SOURCES EXCLUDE REGEX "/temp/")
 list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-n0/")
 list(FILTER LDPC_COMMON_SOURCES EXCLUDE REGEX "/gen-random/")
 
@@ -78,12 +90,22 @@ set(TTA_INCLUDE_FLAGS
     "-I${ETL_ROOT}/include"
     "-I${CMAKE_CURRENT_SOURCE_DIR}/include"
     "-I${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/common/include"
+    "-I${OPENASIP_ROOT}/targets/tta/asic/kernels/5gnr/ldpc/cores/common/include"
     "-I${OPENASIP_ROOT}/targets/tta/kernels/common/lib/cpp"
     "-I${OPENASIP_ROOT}/targets/common/kernels/lib/cpp"
     "-I${ETL_INSTALL_DIR}/include"
 
+    # Define and implement methods which use decode-specific custom FU OpenASIP macros
+    "-DNRLDPC_USE_DECODER_CUSTOM_FUS"
+
+    # Disable assertions.
+    "-DNDEBUG"
+
     # Use ETL's numeric implementation in the common norm_dist.h.
     "-DLDPC_USE_ETL"
+
+    # See defines.h
+    "-DMULTICORE_TTA"
 )
 
 # ---------------------------------------------------------------------------
@@ -94,12 +116,12 @@ add_custom_command(
     COMMAND "${OACC_EXECUTABLE}"
             --swfp
             -V
-            -DNDEBUG
             -fno-exceptions
             -O3
             ${TTA_INCLUDE_FLAGS}
             ${LDPC_DECODE_TTA_ASIC_SOURCES}
-            ${LDPC_TTA_ASIC_SOURCES}
+            ${LDPC_TTA_ASIC_CORES_COMMON_SOURCES}
+            ${LDPC_TTA_ASIC_COMMON_SOURCES}
             ${LDPC_COMMON_SOURCES}
             -a "${ASIC_ADF_FILE}"
             -o "${ASIC_TPEF_FILE}"
@@ -107,8 +129,11 @@ add_custom_command(
         ${LDPC_DECODE_TTA_ASIC_HEADERS}
         ${LDPC_DECODE_TTA_ASIC_SOURCES}
 
-        ${LDPC_TTA_ASIC_HEADERS}
-        ${LDPC_TTA_ASIC_SOURCES}
+        ${LDPC_TTA_ASIC_CORES_COMMON_HEADERS}
+        ${LDPC_TTA_ASIC_CORES_COMMON_SOURCES}
+
+        ${LDPC_TTA_ASIC_COMMON_HEADERS}
+        ${LDPC_TTA_ASIC_COMMON_SOURCES}
 
         ${LDPC_COMMON_HEADERS}
         ${LDPC_COMMON_SOURCES}
@@ -126,7 +151,31 @@ add_custom_command(
     VERBATIM
 )
 
+set(IMG_STAMP "${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_NAME}_generatebits.stamp")
+find_program(GENERATEBITS_EXECUTABLE generatebits)
+if(NOT GENERATEBITS_EXECUTABLE)
+    message(WARNING
+        "generatebits was not found. "
+        "The ${KERNEL_TARGET} target will fail until the OpenASIP environment is available."
+    )
+endif()
+add_custom_command(
+    OUTPUT "${IMG_STAMP}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/img"
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_BINARY_DIR}/img"
+            "${GENERATEBITS_EXECUTABLE}"
+            --entity-name=tta0_${KERNEL}
+            --decompressor 
+            --dataimages 
+            --verbose 
+            --program ${ASIC_TPEF_FILE} 
+            ${ASIC_ADF_FILE}
+    DEPENDS
+        ${ASIC_ADF_FILE}
+        ${ASIC_TPEF_FILE}
+)
+
 # Make generation explicit at the target level.
 add_custom_target(${KERNEL_TARGET}
-    DEPENDS "${ASIC_TPEF_FILE}"
+    DEPENDS "${ASIC_TPEF_FILE}" "${IMG_STAMP}"
 )

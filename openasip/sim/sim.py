@@ -154,7 +154,10 @@ def main(logger,target,systemC,ttasim_flags,adf_file,tpef_file,simulator,sim_roo
         cmd += ["-p",fr"{tpef_file}"] 
         logger.info(fr"Starting {simulator}...")
     else: # x86_64 or tta-SystemC
-        cmd = [fr"{x86_64_program}"]
+        cmd = ["stdbuf"
+               ,"-o0" # line-buffer stdout
+               ,"-e0" # line-buffer stderr
+               ,fr"{x86_64_program}"]
         if x86_64_program_args:
             for arg in x86_64_program_args:
                 cmd.append(fr"{arg}")

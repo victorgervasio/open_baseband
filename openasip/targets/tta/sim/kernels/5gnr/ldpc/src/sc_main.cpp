@@ -1473,6 +1473,8 @@ int sc_main(
     int argc,
     char* argv[])
 {
+    //setvbuf(stdout, nullptr, _IONBF, 0);
+    //setvbuf(stderr, nullptr, _IONBF, 0);
     /*
      * The architecture and TPEF names are supplied by the build system.
      *

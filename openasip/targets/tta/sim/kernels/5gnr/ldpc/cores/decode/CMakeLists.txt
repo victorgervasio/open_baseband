@@ -93,6 +93,7 @@ set(TTA_INCLUDE_FLAGS
     "-I${OPENASIP_ROOT}/targets/tta/kernels/common/lib/cpp"
     "-I${OPENASIP_ROOT}/targets/common/kernels/lib/cpp"
     "-I${ETL_INSTALL_DIR}/include"
+
     # Define and implement methods which use decode-specific custom FU OpenASIP macros
     "-DNRLDPC_USE_DECODER_CUSTOM_FUS"
 

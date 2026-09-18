@@ -6,6 +6,36 @@
     <file>tce:DefaultICDecoderPlugin.so</file>
   </ic-decoder-plugin>
 
+  <fu name="shl_shr_shru">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>59</fu-id>
+  </fu>
+
+  <fu name="lsu_1_1">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>399</fu-id>
+  </fu>
+
+  <fu name="lsu_1_3">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>399</fu-id>
+  </fu>
+
+  <fu name="lsu_1_2">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>399</fu-id>
+  </fu>
+
+  <fu name="alu_1_1">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>401</fu-id>
+  </fu>
+
+  <fu name="alu_1_3">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>401</fu-id>
+  </fu>
+
   <fu name="lsu">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
     <fu-id>399</fu-id>
@@ -16,19 +46,24 @@
     <fu-id>401</fu-id>
   </fu>
 
-  <fu name="shl_shr_shru_1">
+  <fu name="lsu_1_3_2">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <fu-id>46</fu-id>
+    <fu-id>399</fu-id>
   </fu>
 
-  <fu name="shl_shr_shru">
+  <fu name="alu_1_2">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <fu-id>47</fu-id>
+    <fu-id>401</fu-id>
   </fu>
 
-  <fu name="shl_shr_shru_1_1">
+  <fu name="lsu_1_3_1">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <fu-id>46</fu-id>
+    <fu-id>399</fu-id>
+  </fu>
+
+  <fu name="lsu_1_3_3">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <fu-id>399</fu-id>
   </fu>
 
   <fu name="lsu_1">
@@ -41,19 +76,24 @@
     <fu-id>401</fu-id>
   </fu>
 
-  <fu name="lsu_1_1">
-    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <fu-id>399</fu-id>
+  <fu name="CHECK_NODE_19">
+    <hdb-file>custom/hdb/5gnr_ue_baseband_proc_custom.hdb</hdb-file>
+    <fu-id>9</fu-id>
   </fu>
 
-  <fu name="alu_1_1">
-    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <fu-id>401</fu-id>
+  <fu name="CHECK_NODE_19_1">
+    <hdb-file>custom/hdb/5gnr_ue_baseband_proc_custom.hdb</hdb-file>
+    <fu-id>9</fu-id>
   </fu>
 
-  <fu name="rtc">
-      <hdb-file>/home/victor/open_baseband/openasip/arch/custom/hdb/5gnr_ue_baseband_proc_custom.hdb</hdb-file>
-    <fu-id>5</fu-id>
+  <fu name="CHECK_NODE_19_2">
+    <hdb-file>custom/hdb/5gnr_ue_baseband_proc_custom.hdb</hdb-file>
+    <fu-id>9</fu-id>
+  </fu>
+
+  <fu name="CHECK_NODE_19_3">
+    <hdb-file>custom/hdb/5gnr_ue_baseband_proc_custom.hdb</hdb-file>
+    <fu-id>9</fu-id>
   </fu>
 
   <rf name="RF">
@@ -61,9 +101,14 @@
     <rf-id>179</rf-id>
   </rf>
 
+  <rf name="RF_1_1">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>96</rf-id>
+  </rf>
+
   <rf name="RF_1">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <rf-id>180</rf-id>
+    <rf-id>1738</rf-id>
   </rf>
 
   <rf name="bool">
@@ -71,14 +116,24 @@
     <rf-id>96</rf-id>
   </rf>
 
-  <rf name="bool_1">
+  <rf name="RF_1_1_1">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
     <rf-id>96</rf-id>
   </rf>
 
-  <rf name="RF_1_1">
+  <rf name="RF_1_1_1_1_1_2">
     <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
-    <rf-id>96</rf-id>
+    <rf-id>1737</rf-id>
+  </rf>
+
+  <rf name="RF_1_1_1_1_1_1">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>1737</rf-id>
+  </rf>
+
+  <rf name="RF_1_1_1_1_1">
+    <hdb-file>tce:asic_130nm_1.5V.hdb</hdb-file>
+    <rf-id>1737</rf-id>
   </rf>
 
 </adf-implementation>

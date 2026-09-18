@@ -227,8 +227,8 @@ ensure-hdb:
 build-tta: OPENASIP_TARGET=tta
 build-tta: configure
 	$(SOURCE_TCE)
-	#$(CMAKE) --build "$(BUILD_DIR)" --target build-tta -j$(NPAR) -- --output-sync=line
-	$(CMAKE) --build "$(BUILD_DIR)" --target build-tta
+	$(CMAKE) --build "$(BUILD_DIR)" --target build-tta -j$(NPAR) -- --output-sync=line
+	#$(CMAKE) --build "$(BUILD_DIR)" --target build-tta
 
 build-tta-sim: OPENASIP_TARGET=tta
 build-tta-sim: configure

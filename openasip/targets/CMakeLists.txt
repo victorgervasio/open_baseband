@@ -66,10 +66,9 @@ if(OPENASIP_TARGET STREQUAL "tta" OR OPENASIP_TARGET STREQUAL "all")
     # ---------------------------------------------------------------
     # build-tta dependency chain
     #   build-tta-asic dependency chain
-    #add_dependencies(build-tta-asic-kernels-5gnr-ldpc-encode generate-ldpc-common) #TODO
-    #add_dependencies(build-tta-asic-kernels-5gnr-ldpc-decode generate-ldpc-common) #TODO
-    #add_dependencies(build-tta-asic-kernels-5gnr-ldpc build-tta-asic-kernels-5gnr-ldpc-encode build-tta-asic-kernels-5gnr-ldpc-decode) #TODO
-    add_dependencies(build-tta-asic-kernels-5gnr-ldpc generate-ldpc-common) #XXX
+    add_dependencies(build-tta-asic-kernels-5gnr-ldpc-encode generate-ldpc-common)
+    add_dependencies(build-tta-asic-kernels-5gnr-ldpc-decode generate-ldpc-common)
+    add_dependencies(build-tta-asic-kernels-5gnr-ldpc build-tta-asic-kernels-5gnr-ldpc-encode build-tta-asic-kernels-5gnr-ldpc-decode)
     add_dependencies(build-tta-asic-kernels-5gnr build-tta-asic-kernels-5gnr-ldpc)
     add_dependencies(build-tta-asic-kernels build-tta-asic-kernels-5gnr)
     add_dependencies(build-tta-asic build-tta-asic-kernels)
